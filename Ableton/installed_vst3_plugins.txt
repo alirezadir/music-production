@@ -1,0 +1,80 @@
+Directory /Users/alirezadirafzoon/Library/Audio/Plug-Ins/VST3 does not exist.
+Listing VST3 plugins in /Library/Audio/Plug-Ins/VST3:
+ARP 2600 V3.vst3
+Acid V.vst3
+Augmented BRASS.vst3
+Augmented GRAND PIANO.vst3
+Augmented STRINGS.vst3
+Augmented VOICES.vst3
+Augmented WOODWINDS.vst3
+B-3 V2.vst3
+BarkOfDog2.vst3
+Buchla Easel V.vst3
+CMI V.vst3
+CP-70 V.vst3
+CS-80 V4.vst3
+CZ V.vst3
+Clavinet V.vst3
+Cymatics Diablo Lite.vst3
+DX7 V.vst3
+Diva.vst3
+Emulator II V.vst3
+Farfisa V.vst3
+Hybrid Filter.vst3
+Insight 2.vst3
+Jun-6 V.vst3
+Jup-8 V4.vst3
+KORG MS-20 V.vst3
+Kickstart 2.vst3
+Matrix-12 V2.vst3
+Mellotron V.vst3
+Mini V4.vst3
+MiniFreak V.vst3
+Modnetic.vst3
+Modular V3.vst3
+OP-Xa V.vst3
+Opus.vst3
+Ozone 11 Clarity.vst3
+Ozone 11 Dynamic EQ.vst3
+Ozone 11 Dynamics.vst3
+Ozone 11 Equalizer.vst3
+Ozone 11 Exciter.vst3
+Ozone 11 Imager.vst3
+Ozone 11 Impact.vst3
+Ozone 11 Low End Focus.vst3
+Ozone 11 Master Rebalance.vst3
+Ozone 11 Match EQ.vst3
+Ozone 11 Maximizer.vst3
+Ozone 11 Spectral Shaper.vst3
+Ozone 11 Stabilizer.vst3
+Ozone 11 Vintage Compressor.vst3
+Ozone 11 Vintage EQ.vst3
+Ozone 11 Vintage Limiter.vst3
+Ozone 11 Vintage Tape.vst3
+Ozone 11.vst3
+Ozone Imager 2.vst3
+Piano V3.vst3
+Prophet-5 V.vst3
+Prophet-VS V.vst3
+Relay.vst3
+Rob Papen
+SEM V2.vst3
+SQ80 V.vst3
+SausageFattener.vst3
+Serum.vst3
+ShaperBox 3.vst3
+Solina V2.vst3
+SpliceBridge.vst3
+Stage-73 V2.vst3
+Synclavier V.vst3
+SynthGPT.vst3
+Synthi V.vst3
+TAL-Reverb-4.vst3
+Tonal Balance Control 2.vst3
+VOX Continental V2.vst3
+Vocoder V.vst3
+WaveShell1-VST3 14.12.vst3
+Wider.vst3
+Wurli V3.vst3
+Youlean Loudness Meter 2.vst3
+dubler-midi-capture.vst3

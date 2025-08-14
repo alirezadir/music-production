@@ -1,0 +1,337 @@
+================================================================================
+
+POST /api/upload/
+    Uploads a file to the server. The file will be deleted in a day.
+
+Parameters (http headers):
+    Content-Disposition: "attachment; filename=<filename>" -- a name of the file (see rfc6266).
+    Authorization: "license <key>" -- a user license, required
+
+Returns (json):
+    {
+        "status": "success" | "error"
+        "id": uploaded file id if the status is "success"
+        "size" (int): the media file size in bytes if the status is "success"
+        "duration" (float): the media file duration in seconds if the status is "success"
+        "expires" (int): file expiration time in Unix epoch format with UTC timezone if the status is "success"
+        "error": Error description if the status is "error"
+    }
+
+Examples:
+    $ curl --url https://www.lalal.ai/api/upload/ --data-binary @any_file.mp3 --header "Content-Disposition: attachment; filename=any_file.mp3" --header "Authorization: license 14abcde0"
+    {"status": "success", "id": "9a3ae258-7693-4046-87c2-ef577eb752bb", "duration": 435.05}
+
+    $ curl --url https://www.lalal.ai/api/upload/ --data-binary @any_file.mp3
+    {"status": "error", "error": "No file name (use the Content-Disposition header)"}
+
+Notes:
+    Upload limit is 2Gb if a request has a valid license in the Authorization header otherwise 1Gb
+
+
+
+
+================================================================================
+
+POST /api/upload/multipart/create/
+    Initializes multipart upload.
+
+Parameters (http headers):
+    Authorization: "license <key>" -- a user license
+
+Parameters (form-urlencoded):
+    file_name (str): the file name
+    parts_count (int): the number of parts to upload, could be calculated as file_size / part_size (5Mb for example)
+
+Returns (json):
+    {
+        "file_id": the file id
+        "upload_id": an upload id to use in complete_multipart_upload method
+        "upload_urls": a list of presigned urls to upload parts
+    }
+
+Example:
+    curl -X POST --url "https://www.lalal.ai/api/upload/multipart/create/"             --data-urlencode "file_name=FN.mp3" --data-urlencode "parts_count=3"
+
+
+
+
+================================================================================
+
+POST /api/upload/multipart/complete/
+    Complets multipart upload.
+
+Parameters (http headers):
+    Authorization: "license <key>" -- a user license
+
+Parameters (form-urlencoded):
+    file_id (str): the file id
+    upload_id (str): the upload id from the create_multipart_upload
+
+Returns (json):
+    {
+        "status": "success" | "error"
+        "id": uploaded file id if the status is "success"
+        "name": uploaded file name if the status is "success"
+        "size" (int): the media file size in bytes if the status is "success"
+        "duration" (float): the media file duration in seconds if the status is "success"
+        "expires" (int): file expiration time in Unix epoch format with UTC timezone if the status is "success"
+        "error": Error description if the status is "error"
+    }
+
+Example:
+    curl -X POST --url "https://www.lalal.ai/api/upload/complete/" --data-urlencode "file_id=fid" --data-urlencode "upload_id=uid"
+
+
+
+
+================================================================================
+
+POST /api/split/
+    Puts a file or multiple files in the split queue (full media file splitting).
+    If muptiple files passed and user have any paid license - batch processing automatically will start
+
+Parameters (http headers):
+    Authorization: "license <key>" -- a user license, required
+
+Parameters (form-urlencoded):
+    params (str): json encoded list of dict with split arguments:
+
+        id     (str): File id obtained from /upload/ method.
+        splitter (str, optional): The type of neural network used to split audio. Possible values are 'phoenix', 'orion' or 'perseus'.
+            If parameter is not provided - automatically choose most effective splitter for selected stem.
+            Perseus stems: ('vocals', 'voice', 'drum', 'piano', 'bass', 'electric_guitar', 'acoustic_guitar')
+            Orion stems: ('vocals', 'voice', 'drum', 'piano', 'bass', 'electric_guitar', 'acoustic_guitar')
+            Phoenix stems: ('vocals', 'voice', 'drum', 'piano', 'bass', 'electric_guitar', 'acoustic_guitar', 'synthesizer', 'strings', 'wind')
+        stem (str, optional): Split source track to track with selected stem and back track.
+                                One of ("vocals", "voice", "drum", "bass", "piano", "electric_guitar, "acoustic_guitar", "synthesizer", "strings", "wind").
+                                "vocals" by default.
+        dereverb_enabled (bool, optional): Enable or disable dereverberation. Default is false.
+        enhanced_processing_enabled (bool, optional): Enable enhanced processing for the track. Default is false. All stems, except "voice"
+        noise_cancelling_level (int, optional): Noise cancelling level for "voice" stem. Possible values are 0 -- mild, 1 -- normal (default), 2 -- aggressive.
+
+Returns (json):
+    {
+        "status": "success" | "error"
+        "error": Error description if the status is "error"
+        "task_id": a list of comma-separated task id (if the status is "success")
+    }
+
+Examples:
+    $ curl --url https://www.lalal.ai/api/split/ --header "Authorization: license 14abcde0"
+    --form-string 'params=[{"id": "9a3ae258-7693-4046-87c2-ef577eb752bb", "filter": 2, "stem": "piano"}, {"id": "a1d5ebb6-208a-47fd-99b7-891ba5d9d6e6", "stem": "vocals"}]'
+    {"status": "success"}
+
+    $ curl --url https://www.lalal.ai/api/split/ --form-string 'params=[{"id=9a3ae258-7693-4046-87c2-ef577eb752bb"}]'
+    {"status": "error", "error": "No lisence (use Authorization header)"}
+
+
+
+
+================================================================================
+
+POST /api/cancel/
+    Cancels the current task and sets the status to canceled for the task, if it exists and is running.
+
+Parameters (http headers):
+    Authorization: license <key> -- a user license, optional (if there is no license it is necessary to use csrf tokens)
+
+Parameters (form-urlencoded):
+    id (str): Comma separated file ids obtained from /upload/ method.
+
+Returns (json):
+    {
+        "status": "success" | "error"
+        "error": Error description if the status is "error"
+    }
+Examples:
+    $ curl --url https://www.lalal.ai/api/cancel/ --header "Authorization: license 14abcde0" --form-string "id=9a3ae258-7693-4046-87c2-ef577eb752bb,a1d5ebb6-208a-47fd-99b7-891ba5d9d6e6"
+    {"status": "success"}
+
+    $ curl --url https://www.lalal.ai/api/cancel/ --header "Authorization: license 14abcde0" --form-string "id=9a3ae258-7693-4046-87c2"
+    {"status": "error", "error": "Invalid file id"}
+
+
+
+
+================================================================================
+
+POST /api/check/
+    Gets the result of split task
+
+Parameters (http headers):
+    Authorization: "license <key>" -- a user license, required
+
+Parameters (form-urlencoded):
+    id (str): Comma separated file ids obtained from /upload/ method.
+
+Returns (json):
+    {
+        "status": "success" | "error"
+        "result": {
+            "file_id_1": {
+                "status": "success" | "error"
+                "name": the file name if the status is "success"
+                "size": the file size in bytes if the status is "success"
+                "duration": estimated file duration in seconds if the status is "success"
+                "splitter": "phoenix" | "orion"
+                "stem": stem option if the status is "success".
+                        one of ("vocals", "drum", "bass", "piano", "electric_guitar", "acoustic_guitar", "synthesizer").
+                        "vocals" by default.
+
+                "split" (nullable): {
+                    "duration": actual duration in seconds for split
+                    "stem": stem option for split,
+                    "stem_track": a url of stem,
+                    "stem_track_size" (int): stem file size in bytes,
+                    "back_track": a url of back track,
+                    "back_track_size" (int): back track file size in bytes
+                } if the status is "success" and the split task with has successfully completed
+
+                "task" (nullable): {
+                    "state": "success" | "error" | "progress" | "cancelled",
+                    "error" (nullable): Error description if the state is "error",
+                    "progress" (int, nullable): a task progress (0..100) if the state is "progress",
+                } if the status is "success" and some task has been invoked
+
+                "error": Error description if the status is "error"
+            },
+            "file_id_2": {
+                ...
+            },
+        }
+    }
+
+Examples:
+    $ curl --url https://www.lalal.ai/api/check/ --form-string "id=9a3ae258-7693-4046-87c2-ef577eb752bb,a1d5ebb6-208a-47fd-99b7-891ba5d9d6e6" --header "Authorization: license 14abcde0"
+    {
+        "status": "success",
+        "result": {
+            '9a3ae258-7693-4046-87c2-ef577eb752bb': {"status": "success", "name": "song.mp3", ...},
+            'a1d5ebb6-208a-47fd-99b7-891ba5d9d6e6': {"status": "error", "error": "Invalid extension",},
+        }
+    }
+
+    $ curl --url https://www.lalal.ai/api/check/ --form-string "id=123123!" --header "Authorization: license 14abcde0"
+    {"status": "error", "error": "Invalid file id"}
+
+
+
+
+================================================================================
+
+GET /billing/get-limits/?key=<license key>
+    Summary user limits.
+
+Parameters (query string):
+    key (str): a license key.
+
+Returns (json):
+    {
+        "status": "success" | "error",
+        "error": Error description if the status is "error",
+        "option": current user option,
+        "email": user email,
+        "process_duration_limit" (float): total tracks duration limit in minutes,
+        "process_duration_used" (float): total processed tracks duration in minutes,
+        "process_duration_left" (float): total tracks duration left in minutes,
+    }
+
+Examples:
+    $ curl --url https://www.lalal.ai/billing/get-limits/?key=d5394d17"
+    {"status": "success", "option": "Plus", "email": "user@mail.com",  ...
+
+    $ curl --url https://www.lalal.ai/billing/get-limits/?key=d539"
+    {"status": "error", "error": "License not found"}
+
+
+
+
+================================================================================
+
+POST /api/change_voice/
+    Puts a file in the voice change queue.
+
+Parameters (http headers):
+    Authorization: license <key> -- a user license
+
+Parameters (form-urlencoded):
+    id     (str): File id obtained from /upload/ method.
+    voice  (str): The voice pack that is applied to file to replace original voice.
+                  could be one of trained voice pack ids in status "ready to use", browsable with /api/voice_packs/list/ method.
+                  or one of legal voice packs:
+                  "ALEX_KAYE", "STASIA_FAYE", "NICOLAAS_HAAS", "NIK_ZEL", "OLIA_CHEBO", "YVAR_DE_GROOT", "VETRANA"
+    accent_enhance (bool, optional, true|false): Enable accent enhance (true by default).
+    pitch_shifting (bool, optional, true|false): Enable pitch shifting (true by default).
+    dereverb_enabled (bool, optional, true|false): Enable dereverb (remove echo) (false by default).
+
+Returns (json):
+    {
+        "status": "success" | "error"
+        "id": a file id (if the status is "success"), by which the task can be checked
+        "task_id": a task id (if the status is "success")
+        "error": Error description if the status is "error"
+    }
+
+Examples:
+    $ curl --url https://www.lalal.ai/api/change_voice/ --header "Authorization: license 14abcde0" --form-string "id=9a3ae258" --form-string "voice=ALEX_KAYE"
+    {"status": "success"}
+
+    $ curl --url https://www.lalal.ai/api/change_voice/ --form-string "id=9a3ae258" --form-string "voice=ALEX_KAYE"
+    {"status": "error", "error": "No lisence (use Authorization header)"}
+
+
+
+
+================================================================================
+
+GET /api/voice_packs/list/
+    Returns list of user packs, ordered by name
+
+Http headers:
+    Authorization: "license <key>" -- a user license
+
+Response example:
+    {
+        "status": "success",
+        "packs": [
+            {
+                "pack_id": "pack_id",
+                "name": "My Custom Pack",
+                "created": "2024-03-16T00:00:00Z",
+                "ready_to_use": bool,
+                "avatar_url": str|null,
+                "expiration_date": "2024-03-31",
+                "expires_after_days": 2,
+                "language": {
+                    "code": str,
+                    "full": str,
+                },
+                "previews": [
+                    {
+                        "label": "artist_1",
+                        "playlist": "preview_1_playlist_url",
+                        "waveform": "preview_1_waveform_url",
+                        "sample": {
+                            "playlist": "sample_1_playlist_url",
+                            "waveform": "sample_1_waveform_url",
+                        },
+                    },
+                    ...
+                    {
+                        "label": "artist_N",
+                        "playlist": "preview_N_playlist_url",
+                        "waveform": "preview_N_waveform_url",
+                        "sample": {
+                            "playlist": "sample_N_playlist_url",
+                            "waveform": "sample_N_waveform_url",
+                        },
+                    },
+                ]
+            },
+            ...
+        ],
+        }
+    }
+
+
+

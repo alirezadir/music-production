@@ -1,0 +1,36 @@
+{
+    "hat": "hihat",
+    "hh": "hihat",
+    "hats": "hihat",
+    "sn": "snare",
+    "perc": "percussion",
+    "percussive": "percussion",
+    "fill": "roll",
+    "ride": "cymbal",
+    "crash": "cymbal",
+
+    "buildup": "build",
+    "undertone": "drone",
+    "glass": "foley",
+    "scrapyard": "foley",
+    "space": "ambience",
+    "distortion": "fx",
+    "foley": "fx",
+    "sweep": "riser",
+    "whoosh": "riser",
+
+
+
+    "vox": "vocal",
+    "voc": "vocal",
+
+    "keys": "piano",
+
+    "progression": "chord",
+
+    "starter": "songstarter",
+    "kit": "songstarter",
+
+    "texture": "pad",
+    "ambient": "pad"
+}

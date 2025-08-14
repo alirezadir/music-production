@@ -1,0 +1,44 @@
+{
+  "id": "mh_techno_drums_20250810_012355",
+  "version": "1.1.0",
+  "created_at": "2025-08-10T01:23:55.329703Z",
+  "generator": {
+    "app": "diream-ai",
+    "script": "make_mh_techno_drums.py",
+    "commit": "a1b2c3",
+    "params": {
+      "bpm": 124,
+      "bars": 8,
+      "build_bars": 2,
+      "swing": 0.56,
+      "human": 3,
+      "seed": 17,
+      "flavor": "none",
+      "ticks_per_beat": 480
+    }
+  },
+  "theory": {
+    "style": "melodic-house-techno",
+    "rhythm_type": "four-on-the-floor",
+    "flavor": "none",
+    "groove_style": "house"
+  },
+  "timeline": {
+    "ppq": 480,
+    "tempo_bpm": 124,
+    "total_bars": 10,
+    "main_loop_bars": 8,
+    "build_section_bars": 2
+  },
+  "tags": [
+    "melodic-house",
+    "techno",
+    "drum-patterns",
+    "midi-loops"
+  ],
+  "derived": {
+    "total_duration_seconds": 19.35483870967742,
+    "pattern_complexity": "medium",
+    "swing_intensity": "heavy"
+  }
+}

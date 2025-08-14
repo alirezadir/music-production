@@ -1,0 +1,33 @@
+Arrangement Skeleton - arr06_skeleton_4min
+==================================================
+
+Tempo: 122 BPM
+Total bars: 120
+Total time: 236.1 seconds
+
+Sections:
+--------------------
+ 1. Intro       : 16 bars (31.5s)
+    Production: Kick, Closed Hat, FX bed, establish groove
+
+ 2. Uplift      :  8 bars (15.7s)
+    Production: Add bass low-pass, ride noise, energy build
+
+ 3. Vocal/Hook  :  8 bars (15.7s)
+    Production: Hook phrase, sparse drums, focus on melody
+
+ 4. Break       : 16 bars (31.5s)
+    Production: Pads, arp fragments, vox chop, atmospheric
+
+ 5. Build       :  8 bars (15.7s)
+    Production: Snare roll, risers, filter open, energy peak
+
+ 6. Drop A      : 32 bars (63.0s)
+    Production: Full groove, main lead, maximum energy
+
+ 7. Drop B      : 16 bars (31.5s)
+    Production: Variation lead/counterline, keep energy
+
+ 8. Outro       : 16 bars (31.5s)
+    Production: DJ-friendly drums only, clean ending
+

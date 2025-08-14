@@ -1,0 +1,12 @@
+Key=F#m Mode=dorian
+
+P01: i:F#/A/C# | IV:B/D#/F# | v:C#/E/G# | IV:B/D#/F#
+P02: i:F#/A/C# | VII:E/G#/B | IV:B/D#/F# | i:F#/A/C#
+P03: i:F#/A/C# | IV:B/D#/F# | III:A/C#/E | IV:B/D#/F#
+P04: i:F#/A/C# | III:A/C#/E | IV:B/D#/F# | i:F#/A/C#
+P05: i:F#/A/C# | IV:B/D#/F# | i:F#/A/C# | VII:E/G#/B
+P06: i:F#/A/C# | VII:E/G#/B | i:F#/A/C# | IV:B/D#/F#
+P07: i:F#/A/C# | v:C#/E/G# | IV:B/D#/F# | i:F#/A/C#
+P08: i:F#/A/C# | IV:B/D#/F# | VII:E/G#/B | i:F#/A/C#
+P09: i:F#/A/C# | III:A/C#/E | VII:E/G#/B | IV:B/D#/F#
+P10: i:F#/A/C# | IV:B/D#/F# | III:A/C#/E | i:F#/A/C#

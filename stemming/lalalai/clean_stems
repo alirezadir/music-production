@@ -1,0 +1,126 @@
+#!/bin/bash
+
+# Clean Stems - A script to clean up stem files
+# Usage: ./clean_stems <directory_with_stems>
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to show usage
+show_usage() {
+    echo "Usage: $0 <directory_with_stems>"
+    echo ""
+    echo "This script will:"
+    echo "  1. Rename files containing '_no_vocals_' to '_Instrumental_'"
+    echo "  2. Delete all files containing '_no_' in the filename"
+    echo ""
+    echo "Examples:"
+    echo "  $0 ./stems"
+    echo "  $0 /path/to/stem/directory"
+    echo ""
+    echo "Warning: This will permanently delete files with '_no_' in the name!"
+}
+
+# Check if directory is provided
+if [[ $# -eq 0 ]]; then
+    print_error "No directory specified"
+    show_usage
+    exit 1
+fi
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_usage
+    exit 0
+fi
+
+STEMS_DIR="$1"
+
+# Check if directory exists
+if [[ ! -d "$STEMS_DIR" ]]; then
+    print_error "Directory does not exist: $STEMS_DIR"
+    exit 1
+fi
+
+print_info "Cleaning stems in directory: $STEMS_DIR"
+
+# Counter for operations
+renamed_count=0
+deleted_count=0
+
+# Step 1: Rename _no_vocals_ to _Instrumental_
+print_info "Step 1: Renaming '_no_vocals_' to '_Instrumental_'..."
+
+for file in "$STEMS_DIR"/*; do
+    if [[ -f "$file" ]]; then
+        filename=$(basename "$file")
+        if [[ "$filename" == *"_no_vocals_"* ]]; then
+            new_filename=$(echo "$filename" | sed 's/_no_vocals_/_Instrumental_/g')
+            new_path="$STEMS_DIR/$new_filename"
+            
+            if [[ "$file" != "$new_path" ]]; then
+                mv "$file" "$new_path"
+                print_info "Renamed: $filename -> $new_filename"
+                ((renamed_count++))
+            fi
+        fi
+    fi
+done
+
+print_success "Renamed $renamed_count files"
+
+# Step 2: Delete all files with _no_ in the name
+print_info "Step 2: Deleting files with '_no_' in the name..."
+
+for file in "$STEMS_DIR"/*; do
+    if [[ -f "$file" ]]; then
+        filename=$(basename "$file")
+        if [[ "$filename" == *"_no_"* ]]; then
+            print_warning "Deleting: $filename"
+            rm "$file"
+            ((deleted_count++))
+        fi
+    fi
+done
+
+print_success "Deleted $deleted_count files"
+
+# Summary
+print_info "Cleanup completed!"
+print_info "Files renamed: $renamed_count"
+print_info "Files deleted: $deleted_count"
+
+# Show remaining files
+print_info "Remaining files in directory:"
+if [[ -d "$STEMS_DIR" ]]; then
+    remaining_files=$(ls -1 "$STEMS_DIR" 2>/dev/null | wc -l)
+    if [[ $remaining_files -gt 0 ]]; then
+        ls -la "$STEMS_DIR"
+    else
+        print_warning "Directory is now empty"
+    fi
+else
+    print_error "Directory no longer exists"
+fi 

@@ -1,0 +1,221 @@
+{
+  "total_files": 42646,
+  "categories": {
+    "drum": 17873,
+    "loop": 13267,
+    "melodic": 11611,
+    "hit": 11025,
+    "sub": 10429,
+    "perc": 8598,
+    "percussion": 7652,
+    "synth": 7056,
+    "fx": 4394,
+    "shot": 3513,
+    "bass": 3031,
+    "vocal": 3012,
+    "hat": 2936,
+    "organ": 2725,
+    "kick": 2258,
+    "break": 2176,
+    "clap": 1869,
+    "tom": 1686,
+    "one-shot": 1681,
+    "snare": 1390
+  },
+  "loop_types": {
+    "loops": 13911,
+    "unclear": 12654,
+    "oneshots": 14041,
+    "drum_hits": 2040
+  },
+  "bpm_distribution": {
+    "120-129": 7900,
+    "100-109": 356,
+    "110-119": 336,
+    "130-139": 465,
+    "80-89": 25,
+    "140-149": 92,
+    "70-79": 23,
+    "160-169": 93,
+    "180-189": 20,
+    "200-209": 15,
+    "170-179": 1,
+    "90-99": 54,
+    "150-159": 48,
+    "50-59": 11,
+    "10-19": 21
+  },
+  "key_distribution": {
+    "C": 1235,
+    "A": 830,
+    "Amin": 592,
+    "G": 517,
+    "Emin": 469,
+    "Fmin": 448,
+    "Cmin": 422,
+    "F": 384,
+    "Gmin": 354,
+    "D": 349,
+    "B": 306,
+    "Bmin": 283,
+    "Dmin": 279,
+    "E": 226,
+    "C#": 202,
+    "Am": 193,
+    "F#min": 152,
+    "Cm": 140,
+    "A#min": 115,
+    "Cmaj": 112,
+    "Dmaj": 108,
+    "C#min": 103,
+    "G#min": 102,
+    "A#": 95,
+    "D#min": 89,
+    "Bmaj": 84,
+    "D#": 73,
+    "Fm": 71,
+    "F#": 70,
+    "Amaj": 56,
+    "F#maj": 47,
+    "Em": 46,
+    "Gmaj": 42,
+    "D#maj": 38,
+    "F#m": 38,
+    "Gm": 38,
+    "Fmaj": 35,
+    "Dm": 31,
+    "Bm": 31,
+    "G#": 29,
+    "Emaj": 27,
+    "C#maj": 26,
+    "A#maj": 21,
+    "G#m": 20,
+    "C#m": 6,
+    "D#m": 6,
+    "A#m": 5,
+    "G#maj": 5
+  },
+  "sample_examples": {
+    "melodic, texture, fx": [
+      "PMLxOT3_LAR_FX_Loop_001_Crunch.wav",
+      "PMLxOT3_LAR_FX_Loop_002_Distorted Rain.wav",
+      "PMLxOT3_LAR_FX_Loop_003_Footsteps.wav",
+      "PMLxOT3_LAR_FX_Loop_005_Rain.wav",
+      "PMLxOT3_LAR_FX_Loop_007_Textured noise.wav"
+    ],
+    "drum, melodic, texture": [
+      "PMLxOT3_LAR_FX_Loop_004_Hangdrum_Emaj.wav"
+    ],
+    "melodic, piano, texture": [
+      "PMLxOT3_LAR_FX_Loop_006_Reverse Piano_Cmaj .wav"
+    ],
+    "melodic, atmo, texture": [
+      "PMLxOT_SOL_Atmos_01_Rainy_122BPM_Gmin.wav",
+      "PMLxOT_SOL_Atmos_02_Clarify_121BPM_Dmin.wav",
+      "PMLxOT_SOL_Atmos_03_Solemn_123BPM_Emin.wav",
+      "PMLxOT_SOL_Atmos_04_Roth_123BPM_F#min.wav",
+      "PMLxOT_SOL_Atmos_05_Insight_123BPM_Bmin.wav"
+    ],
+    "bass, melodic, loop": [
+      "PMLxOT3_SV_Bass_Loop_001_125BPM_Cmin.wav",
+      "PMLxOT3_SV_Bass_Loop_002_125BPM_G#min.wav",
+      "PMLxOT3_SV_Bass_Loop_003_125BPM_Gmin.wav",
+      "PMLxOT3_SV_Bass_Loop_004_125BPM.wav",
+      "PMLxOT3_SV_Bass_Loop_004_125BPM_G#min.wav"
+    ],
+    "bass, melodic, stab": [
+      "PMLxOT3_TE_Bass_Stab_Loop_001_123BPM_Amin.wav",
+      "PMLxOT3_TE_Bass_Stab_Loop_002_123BPM_Amin.wav",
+      "PMLxOT3_TE_Bass_Stab_Loop_003_123BPM_Amin.wav",
+      "PMLxOT3_TE_Bass_Stab_Loop_004_123BPM_Amin.wav",
+      "PMLxOT3_TE_Bass_Stab_Loop_005_123BPM_Fmin.wav"
+    ],
+    "melodic, loop": [
+      "PMLxOT3_LAR_Melodic_Harmonic_001_120BPM_Bmaj.wav",
+      "PMLxOT3_LAR_Melodic_Harmonic_002_123BPM_F#maj.wav",
+      "PMLxOT3_LAR_Melodic_Harmonic_003_124BPM_Emin.wav",
+      "PMLxOT3_LAR_Melodic_Harmonic_004_124BPM_Cmaj.wav",
+      "PMLxOT3_LAR_Melodic_Harmonic_005_123BPM_Gmin .wav"
+    ],
+    "tom, melodic, loop": [
+      "PMLxOT3_SOL_Melodic_Loop_12_Tomorrow_121BPM_D#min.",
+      "PML_JS_GoldenMonkey_Tom_Loop_121BPM_Bmin.wav",
+      "PML_JS_Soul_Tom_Loop_125BPM_A#min.wav",
+      "PML_JS_Carex_Tom_Loop_120BPM_Bmin.wav",
+      "PML_JS_Timeline_Tom_Loop_122BPM_Cmin.wav"
+    ],
+    "drum, melodic, loop": [
+      "PMLxOT3_Steeldrum_Loop_001_124BPM_Amin.wav",
+      "PMLxOT3_Steeldrum_Loop_002_124BPM_Amin.wav",
+      "PMLxOT3_Steeldrum_Loop_003_124BPM_Gmin.wav",
+      "PMLxOT3_Steeldrum_Loop_004_123BPM_Gmin.wav",
+      "PMLxOT3_Steeldrum_Loop_005_123BPM_Amin.wav"
+    ],
+    "arp, melodic, loop": [
+      "PMLxOT3_SV_Arpeggio_001_125BPM_Cmin.wav",
+      "PMLxOT3_SV_Arpeggio_002_124BPM_Emin.wav",
+      "PMLxOT3_SV_Arpeggio_003_124BPM_Emin.wav",
+      "PMLxOT3_SV_Arpeggio_004_125BPM_Emin.wav",
+      "PMLxOT3_SV_Arpeggio_005_126BPM_Dmin.wav"
+    ],
+    "melodic, brass, loop": [
+      "PMLxOT3_SV_Brass_Loop_001_127BPM_Emin.wav"
+    ],
+    "chord, melodic, loop": [
+      "PMLxOT3_SV_Chord_Loop_001_123BPM_Fmin.wav",
+      "PMLxOT3_SV_Chord_Loop_002_125BPM_Gmin.wav",
+      "PMLxOT3_SV_Chord_Loop_003_127BPM_Emin.wav",
+      "PMLxOT3_SV_Chord_Loop_004_123BPM_Cmin.wav",
+      "PMLxOT3_SV_Chord_Loop_005_123BPM_Cmin.wav"
+    ],
+    "melodic, piano, loop": [
+      "PMLxOT3_SV_Piano_Loop_001_125BPM_Emin.wav",
+      "PMLxOT3_SV_Piano_Loop_002_125BPM_Emin.wav",
+      "PML_JS_Soniangarden_Piano_Loop_124BPM_F#min.wav",
+      "PML_JS_LeavingEarth_Piano_Loop_121BPM_Amin.wav",
+      "PML_JS_Canna_Piano_Loop_123BPM_Emin.wav"
+    ],
+    "chord, melodic, stab": [
+      "PMLxOT3_TE_Chord_Stab_Loop_001_123BPM_D#min.wav",
+      "PMLxOT3_TE_Chord_Stab_Loop_002_123BPM_C#min.wav"
+    ],
+    "lead, melodic, loop": [
+      "PMLxOT3_TE_Lead_Loop_001_123BPM_Dmin.wav",
+      "PMLxOT3_TE_Lead_Loop_002_123BPM_Amin.wav",
+      "PML_JS_Calathea_Lead_Loop_120BPM_G#min.wav",
+      "PML_JS_Calathea_LeadNoisy_Loop_120BPM_G#min.wav",
+      "PML_JS_GoldenMonkey_Lead_Loop_121BPM_Bmin.wav"
+    ],
+    "melodic, stab, loop": [
+      "PMLxOT3_TE_Stabs_Loop_001_124BPM_C#min.wav",
+      "PMLxOT3_TE_Stabs_Loop_002_124BPM_D#min.wav",
+      "PML_JS_Soniangarden_Stab_Loop_124BPM_F#min.wav",
+      "PML_JS_Eureka_Stab_Loop_124BPM_Emin.wav"
+    ],
+    "melodic, string, loop": [
+      "PMLxOT3_TE_Strings_Loop_001_A#min_120BPM.wav",
+      "PMLxOT3_TE_Strings_Loop_002_A#min_120BPM.wav",
+      "PMLxOT3_TE_Strings_Loop_003_A#maj_120BPM.wav",
+      "PMLxOT3_TE_Strings_Loop_004_D#min_120BPM.wav",
+      "PMLxOT3_TE_Strings_Loop_005_F#min_124BPM.wav"
+    ],
+    "melodic, wind, loop": [
+      "PMLxOT3_TE_Woodwinds_Loop_001_G#min_122BPM.wav",
+      "PMLxOT3_TE_Woodwinds_Loop_002_G#min_122BPM.wav"
+    ],
+    "perc, percussion, melodic": [
+      "PMLxOT3_LAR_Percussion_Loop_001_123BPM.wav",
+      "PMLxOT3_LAR_Percussion_Loop_002_123BPM.wav",
+      "PMLxOT3_LAR_Percussion_Loop_003_123BPM.wav",
+      "PMLxOT3_LAR_Percussion_Loop_004_123BPM.wav",
+      "PMLxOT3_LAR_Percussion_Loop_005_123BPM.wav"
+    ],
+    "clap, perc, percussion": [
+      "PMLxOT3_SV_Clap_Loop_001_123BPM.wav",
+      "PMLxOT3_SV_Clap_Loop_002_123BPM.wav",
+      "PMLxOT3_SV_Clap_Loop_003_123BPM.wav",
+      "PMLxOT3_SV_Clap_Loop_004_124BPM.wav",
+      "PMLxOT3_SV_Clap_Loop_005_124BPM.wav"
+    ]
+  }
+}

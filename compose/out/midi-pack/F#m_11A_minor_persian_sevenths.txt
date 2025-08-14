@@ -1,0 +1,12 @@
+Key=F#m Mode=persian
+
+P01: i:F#/A/C#/E | VII:E/G#/B/D | VI:D/F#/A/C# | V:C#/F/G#/B
+P02: i:F#/A/C#/E | iv:B/D/F#/A | V:C#/F/G#/B | i:F#/A/C#/E
+P03: i:F#/A/C#/E | V:C#/F/G#/B | i:F#/A/C#/E | VII:E/G#/B/D
+P04: i:F#/A/C#/E | VI:D/F#/A/C# | V:C#/F/G#/B | i:F#/A/C#/E
+P05: i:F#/A/C#/E | VII:E/G#/B/D | V:C#/F/G#/B | i:F#/A/C#/E
+P06: i:F#/A/C#/E | III:A#/D/F/A | VII:E/G#/B/D | i:F#/A/C#/E
+P07: i:F#/A/C#/E | iv:B/D/F#/A | VI:D/F#/A/C# | V:C#/F/G#/B
+P08: i:F#/A/C#/E | V:C#/F/G#/B | VI:D/F#/A/C# | V:C#/F/G#/B
+P09: i:F#/A/C#/E | VI:D/F#/A/C# | III:A#/D/F/A | V:C#/F/G#/B
+P10: i:F#/A/C#/E | V:C#/F/G#/B | i:F#/A/C#/E | V:C#/F/G#/B

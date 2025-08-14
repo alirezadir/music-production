@@ -1,0 +1,136 @@
+{
+  "metadata": {
+    "filename": "arr01_skeleton_6min",
+    "tempo_bpm": 122,
+    "total_bars": 176,
+    "total_seconds": 346.2,
+    "total_minutes": 5.77,
+    "sections_count": 7,
+    "style": "melodic-house",
+    "structure_type": "electronic-dance-music",
+    "purpose": "arrangement-skeleton-for-production"
+  },
+  "sections": [
+    {
+      "order": 1,
+      "name": "Intro",
+      "bars": 32,
+      "start_bar": 0,
+      "end_bar": 31,
+      "duration_seconds": 63.0,
+      "production_notes": "Kick, Closed Hat, FX bed, establish groove",
+      "visual_pitch": 60,
+      "time_position": {
+        "start_time_seconds": 0.0,
+        "end_time_seconds": 63.0
+      }
+    },
+    {
+      "order": 2,
+      "name": "Build Up",
+      "bars": 8,
+      "start_bar": 32,
+      "end_bar": 39,
+      "duration_seconds": 15.7,
+      "production_notes": "Snare roll, risers, filter open, energy peak",
+      "visual_pitch": 67,
+      "time_position": {
+        "start_time_seconds": 63.0,
+        "end_time_seconds": 78.7
+      }
+    },
+    {
+      "order": 3,
+      "name": "Drop 1",
+      "bars": 48,
+      "start_bar": 40,
+      "end_bar": 87,
+      "duration_seconds": 94.4,
+      "production_notes": "Full groove, main lead, maximum energy",
+      "visual_pitch": 72,
+      "time_position": {
+        "start_time_seconds": 78.7,
+        "end_time_seconds": 173.1
+      }
+    },
+    {
+      "order": 4,
+      "name": "Break",
+      "bars": 24,
+      "start_bar": 88,
+      "end_bar": 111,
+      "duration_seconds": 47.2,
+      "production_notes": "Pads, arp fragments, vox chop, atmospheric",
+      "visual_pitch": 57,
+      "time_position": {
+        "start_time_seconds": 173.1,
+        "end_time_seconds": 220.3
+      }
+    },
+    {
+      "order": 5,
+      "name": "Build",
+      "bars": 16,
+      "start_bar": 112,
+      "end_bar": 127,
+      "duration_seconds": 31.5,
+      "production_notes": "Snare roll, risers, filter open, energy peak",
+      "visual_pitch": 67,
+      "time_position": {
+        "start_time_seconds": 220.3,
+        "end_time_seconds": 251.8
+      }
+    },
+    {
+      "order": 6,
+      "name": "Drop 2",
+      "bars": 32,
+      "start_bar": 128,
+      "end_bar": 159,
+      "duration_seconds": 63.0,
+      "production_notes": "Variation lead/counterline, keep energy",
+      "visual_pitch": 74,
+      "time_position": {
+        "start_time_seconds": 251.8,
+        "end_time_seconds": 314.8
+      }
+    },
+    {
+      "order": 7,
+      "name": "Outro",
+      "bars": 16,
+      "start_bar": 160,
+      "end_bar": 175,
+      "duration_seconds": 31.5,
+      "production_notes": "DJ-friendly drums only, clean ending",
+      "visual_pitch": 52,
+      "time_position": {
+        "start_time_seconds": 314.8,
+        "end_time_seconds": 346.2
+      }
+    }
+  ],
+  "analysis": {
+    "average_section_length": 25.1,
+    "longest_section": [
+      "Drop 1",
+      48
+    ],
+    "shortest_section": [
+      "Build Up",
+      8
+    ],
+    "energy_flow": "low-high-low-high-low",
+    "breakdown_sections": [
+      "Break"
+    ],
+    "drop_sections": [
+      "Drop 1",
+      "Drop 2"
+    ],
+    "build_sections": [
+      "Build Up",
+      "Build"
+    ]
+  }
+}

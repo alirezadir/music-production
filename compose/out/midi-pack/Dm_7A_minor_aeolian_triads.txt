@@ -1,0 +1,22 @@
+Key=D Mode=aeolian
+
+P01: i:D/F/A | VI:A#/D/F | VII:C/E/G | i:D/F/A
+P02: i:D/F/A | VI:A#/D/F | III:F/A/C | VII:C/E/G
+P03: i:D/F/A | iv:G/A#/D | VI:A#/D/F | VII:C/E/G
+P04: i:D/F/A | V:A/C#/E | VI:A#/D/F | VII:C/E/G
+P05: i:D/F/A | VI:A#/D/F | iv:G/A#/D | V:A/C#/E
+P06: i:D/F/A | VI:A#/D/F | VII:C/E/G | III:F/A/C
+P07: i:D/F/A | VII:C/E/G | i:D/F/A | VI:A#/D/F
+P08: i:D/F/A | III:F/A/C | VI:A#/D/F | VII:C/E/G
+P09: i:D/F/A | iv:G/A#/D | V:A/C#/E | i:D/F/A
+P10: i:D/F/A | III:F/A/C | i:D/F/A | VI:A#/D/F
+P11: i:D/F/A | VI:A#/D/F | iv:G/A#/D | i:D/F/A
+P12: i:D/F/A | iv:G/A#/D | i:D/F/A | VII:C/E/G
+P13: i:D/F/A | iv:G/A#/D | VII:C/E/G | i:D/F/A
+P14: i:D/F/A | VI:A#/D/F | iv:G/A#/D | VII:C/E/G
+P15: i:D/F/A | iv:G/A#/D | v:A/C/E | i:D/F/A
+P16: i:D/F/A | III:F/A/C | VI:A#/D/F | i:D/F/A
+P17: i:D/F/A | VI:A#/D/F | i:D/F/A | VI:A#/D/F | VII:C/E/G | i:D/F/A
+P18: i:D/F/A | iv:G/A#/D | i:D/F/A | VI:A#/D/F | VII:C/E/G | i:D/F/A
+P19: i:D/F/A | iv:G/A#/D | V:A/C#/E | VI:A#/D/F
+P20: i:D/F/A | VII:C/E/G | VI:A#/D/F | VII:C/E/G

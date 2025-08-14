@@ -1,0 +1,17 @@
+Key=Am Mode=phrygian
+
+P01: i:A/C/E/G | II:A#/D/F/A | i:A/C/E/G | VII:G/B/D/F
+P02: i:A/C/E/G | II:A#/D/F/A | iv:D/F/A/C | i:A/C/E/G
+P03: i:A/C/E/G | iv:D/F/A/C | VII:G/B/D/F | i:A/C/E/G
+P04: i:A/C/E/G | VII:G/B/D/F | VI:F/A/C/E | V:E/G#/B/D
+P05: i:A/C/E/G | VI:F/A/C/E | II:A#/D/F/A | i:A/C/E/G
+P06: i:A/C/E/G | VII:G/B/D/F | i:A/C/E/G | II:A#/D/F/A
+P07: i:A/C/E/G | VI:F/A/C/E | VII:G/B/D/F | i:A/C/E/G
+P08: i:A/C/E/G | II:A#/D/F/A | VI:F/A/C/E | i:A/C/E/G
+P09: i:A/C/E/G | II:A#/D/F/A | VII:G/B/D/F | i:A/C/E/G
+P10: i:A/C/E/G | II:A#/D/F/A | VI:F/A/C/E | VII:G/B/D/F
+P11: i:A/C/E/G | II:A#/D/F/A | i:A/C/E/G
+P12: i:A/C/E/G | VII:G/B/D/F | VI:F/A/C/E | II:A#/D/F/A | i:A/C/E/G
+P13: II:A#/D/F/A | i:A/C/E/G | VII:G/B/D/F | V:E/G#/B/D
+P14: iv:D/F/A/C | III:C/E/G/B | II:A#/D/F/A | i:A/C/E/G
+P15: i:A/C/E/G | II:A#/D/F/A | VII:G/B/D/F | VI:F/A/C/E

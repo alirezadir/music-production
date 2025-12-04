@@ -1,21 +1,22 @@
 # Chord Progression Analysis Summary
 
 ## Song Information
-- **Key**: Bb Major
+- **Key**: Gm Minor
+- **BPM**: 124
 - **Total Duration**: 151.3 bars (292.8 seconds at 124 BPM)
 - **Total Chords**: 49 chords
 - **Average Chord Duration**: 3.0 bars
 
 ## Chord Frequency Analysis
 
-### Most Common Chords (in Bb Major)
+### Most Common Chords (in Gm Major)
 1. **G:min (vi) - 17 times (34.7%)**
 2. **D#:maj (IV) - 15 times (30.6%)**
 3. **F:maj (V) - 13 times (26.5%)**
 4. **C:maj (ii) - 3 times (6.1%)**
 5. **A#:maj (I) - 1 times (2.0%)**
 
-### Chord Function Distribution
+### Chord Function Distribution (in Gm Minor)
 - **Primary Chords** (I, IV, V): 29 chords
 - **Secondary Chords** (ii, iii, vi): 20 chords
 
@@ -56,15 +57,16 @@
 4. **Total Cadences**: 2
 
 ### Musical Style Indicators
-- **Key**: Bb Major
+- **Key**: Gm Minor
 - **Character**: Modern pop/rock with emphasis on minor chords
 - **Harmonic Rhythm**: Moderate
 - **Sectional Structure**: Clear section markers
 
 ## Technical Notes
-- **BPM**: 124 (assumed from original analysis)
+- **BPM**: 124
 - **Time Signature**: 4/4 (assumed)
-- **Key Signature**: 2 flats (B♭, E♭)
+- **Key**: Gm Minor
+- **Key Signature**: 2 flats (Bb, Eb)
 - **Enharmonic Equivalents**: D# = E♭, A# = B♭
 
-This analysis reveals a modern progression with strong emphasis on minor chords, creating a melancholic character typical of contemporary popular music.
+This analysis reveals a modern progression in Gm Minor with strong emphasis on minor chords, creating a melancholic character typical of contemporary popular music.

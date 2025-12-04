@@ -5,9 +5,53 @@ import os
 import sys
 
 class ChordAnalyzer:
-    def __init__(self, key="Bb"):
+    def __init__(self, key="Bb", bpm=124):
         self.key = key
+        self.bpm = bpm
+        self.key_mode = self.detect_key_mode()
         self.setup_key_analysis()
+    
+    def detect_key_mode(self):
+        """Detect if the key is major or minor"""
+        if self.key.endswith('m'):
+            return 'minor'
+        else:
+            return 'major'
+    
+    def get_key_signature(self):
+        """Get the key signature for the current key"""
+        # Basic key signature mapping
+        key_signatures = {
+            'C': '0 sharps/flats',
+            'G': '1 sharp (F#)',
+            'D': '2 sharps (F#, C#)',
+            'A': '3 sharps (F#, C#, G#)',
+            'E': '4 sharps (F#, C#, G#, D#)',
+            'B': '5 sharps (F#, C#, G#, D#, A#)',
+            'F#': '6 sharps (F#, C#, G#, D#, A#, E#)',
+            'F': '1 flat (Bb)',
+            'Bb': '2 flats (Bb, Eb)',
+            'Eb': '3 flats (Bb, Eb, Ab)',
+            'Ab': '4 flats (Bb, Eb, Ab, Db)',
+            'Db': '5 flats (Bb, Eb, Ab, Db, Gb)',
+            'Gb': '6 flats (Bb, Eb, Ab, Db, Gb, Cb)',
+            # Minor keys
+            'Am': '0 sharps/flats',
+            'Em': '1 sharp (F#)',
+            'Bm': '2 sharps (F#, C#)',
+            'F#m': '3 sharps (F#, C#, G#)',
+            'C#m': '4 sharps (F#, C#, G#, D#)',
+            'G#m': '5 sharps (F#, C#, G#, D#, A#)',
+            'D#m': '6 sharps (F#, C#, G#, D#, A#, E#)',
+            'Dm': '1 flat (Bb)',
+            'Gm': '2 flats (Bb, Eb)',
+            'Cm': '3 flats (Bb, Eb, Ab)',
+            'Fm': '4 flats (Bb, Eb, Ab, Db)',
+            'Bbm': '5 flats (Bb, Eb, Ab, Db, Gb)',
+            'Ebm': '6 flats (Bb, Eb, Ab, Db, Gb, Cb)'
+        }
+        
+        return key_signatures.get(self.key, 'Unknown key signature')
         
     def setup_key_analysis(self):
         """Setup key-specific analysis parameters"""
@@ -237,8 +281,9 @@ class ChordAnalyzer:
         markdown_content = f"""# Chord Progression Analysis Summary
 
 ## Song Information
-- **Key**: {self.key} Major
-- **Total Duration**: {total_bars:.1f} bars ({(total_bars * 4 / 124 * 60):.1f} seconds at 124 BPM)
+- **Key**: {self.key} {self.key_mode.title()}
+- **BPM**: {self.bpm}
+- **Total Duration**: {total_bars:.1f} bars ({(total_bars * 4 / self.bpm * 60):.1f} seconds at {self.bpm} BPM)
 - **Total Chords**: {total_chords} chords
 - **Average Chord Duration**: {avg_duration:.1f} bars
 
@@ -251,7 +296,7 @@ class ChordAnalyzer:
             markdown_content += f"{i}. **{chord_info}**\n"
         
         markdown_content += f"""
-### Chord Function Distribution
+### Chord Function Distribution (in {self.key} {self.key_mode.title()})
 - **Primary Chords** (I, IV, V): {sum(1 for chord in df['chord'] if self.chord_to_degree(chord) in ['I', 'IV', 'V'])} chords
 - **Secondary Chords** (ii, iii, vi): {sum(1 for chord in df['chord'] if self.chord_to_degree(chord) in ['ii', 'iii', 'vi'])} chords
 
@@ -299,18 +344,19 @@ class ChordAnalyzer:
 4. **Total Cadences**: {len(cadences)}
 
 ### Musical Style Indicators
-- **Key**: {self.key} Major
+- **Key**: {self.key} {self.key_mode.title()}
 - **Character**: Modern pop/rock with emphasis on {'minor' if 'vi' in [self.chord_to_degree(chord) for chord in chord_counts.keys()] else 'major'} chords
 - **Harmonic Rhythm**: {'Fast' if rhythm['avg_duration'] < 2 else 'Moderate' if rhythm['avg_duration'] < 4 else 'Slow'}
 - **Sectional Structure**: {'Clear' if len(section_markers) > 0 else 'Unclear'} section markers
 
 ## Technical Notes
-- **BPM**: 124 (assumed from original analysis)
+- **BPM**: {self.bpm}
 - **Time Signature**: 4/4 (assumed)
-- **Key Signature**: 2 flats (B♭, E♭)
+- **Key**: {self.key} {self.key_mode.title()}
+- **Key Signature**: {self.get_key_signature()}
 - **Enharmonic Equivalents**: D# = E♭, A# = B♭
 
-This analysis reveals a modern progression with {'strong emphasis on minor chords' if 'vi' in [self.chord_to_degree(chord) for chord in chord_counts.keys()] else 'balanced chord usage'}, creating a {'melancholic' if 'vi' in [self.chord_to_degree(chord) for chord in chord_counts.keys()] else 'bright'} character typical of contemporary popular music.
+This analysis reveals a modern progression in {self.key} {self.key_mode.title()} with {'strong emphasis on minor chords' if 'vi' in [self.chord_to_degree(chord) for chord in chord_counts.keys()] else 'balanced chord usage'}, creating a {'melancholic' if 'vi' in [self.chord_to_degree(chord) for chord in chord_counts.keys()] else 'bright'} character typical of contemporary popular music.
 """
         
         return markdown_content

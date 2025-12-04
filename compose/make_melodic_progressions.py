@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+"Melodic House & Techno progression pack generator (Aeolian/Dorian/Phrygian/Persian/Major (Ionian))"
 
+"""
 import argparse
 import mido
 from mido import MidiFile, MidiTrack, Message
@@ -23,10 +26,33 @@ CAMELOT_MINOR = {
     "C#m":"12A", "Dbm":"12A",
 }
 
-def key_to_camelot_minor(key_name: str) -> str:
+# --- Camelot major wheel (B = major)
+CAMELOT_MAJOR = {
+    "B":"1B",  "Cb":"1B",
+    "F#":"2B", "Gb":"2B",
+    "Db":"3B", "C#":"3B",
+    "Ab":"4B", "G#":"4B",
+    "Eb":"5B", "D#":"5B",
+    "Bb":"6B", "A#":"6B",
+    "F":"7B",
+    "C":"8B",
+    "G":"9B",
+    "D":"10B",
+    "A":"11B",
+    "E":"12B",
+}
+
+
+def key_to_camelot(key_name: str, is_minor: bool) -> str:
     k = key_name.strip()
-    if not k.endswith('m'): k += 'm'
-    return CAMELOT_MINOR.get(k, "?")
+    if is_minor:
+        if not k.endswith('m'):
+            k += 'm'
+        return CAMELOT_MINOR.get(k, "?")
+    else:
+        if k.endswith('m'):
+            k = k[:-1]
+        return CAMELOT_MAJOR.get(k, "?")
 
 # Prefer common display (flats for Abm/Dbm/Gbm names only when given as such)
 def normalize_display_key_minor(key_name: str) -> str:
@@ -34,10 +60,13 @@ def normalize_display_key_minor(key_name: str) -> str:
     return k if k.endswith('m') else k+"m"
 
 def build_outfile_basename(key_minor: str, mode: str, use_7ths: bool) -> str:
-    disp = normalize_display_key_minor(key_minor)
-    cam = key_to_camelot_minor(key_minor)
+    # Treat as minor unless explicitly using major mode (ionian)
+    is_minor = key_minor.strip().endswith('m') and mode != 'major'
+    disp = normalize_display_key_minor(key_minor) if is_minor else key_minor.strip().rstrip('m')
+    cam = key_to_camelot(key_minor, is_minor)
     q = "sevenths" if use_7ths else "triads"
-    return f"{disp}_{cam}_minor_{mode}_{q}"
+    tonality = "minor" if is_minor else "major"
+    return f"{disp}_{cam}_{tonality}_{mode}_{q}"
 
 def ensure_outdir(path: str):
     d = os.path.dirname(path)
@@ -59,6 +88,45 @@ try:
 except Exception:
     def create_midi_metadata(**kwargs):
         return None
+
+# -----------------------
+# Popular Major (Ionian) progressions – 30 curated shapes
+# -----------------------
+PROGRESSIONS_IONIAN = [
+    # --- Pop staples (most → least popular) ---
+    ["I","V","vi","IV"],                      # 1: ultimate pop staple / MHT hook
+    ["I","IV","vi","V"],                      # 2
+    ["I","vi","IV","V"],                      # 3 ('50s variant)
+    ["vi","IV","I","V"],                      # 4
+    ["I","V","vi","V"],                       # 5 alt pop push
+    ["vi","V","IV","V"],                      # 6 lift & pump
+    ["I","IV","ii","V"],                      # 7 circle fragment
+    ["ii","V","I"],                           # 8 jazzy turnaround (short)
+    ["IV","V","iii","vi"],                    # 9 Royal road core
+    ["I","V","IV","V"],                       # 10 drive
+    ["I","ii","iii","IV","V"],                # 11 ascending chorus
+    ["I","V","vi","IV","V"],                  # 12 extended hook
+    ["I","V","vi","IV","I"],                  # 13 resolve to I
+    ["IV","V","I","vi"],                      # 14 ballad lift
+    ["I","V","ii","IV"],                      # 15 cross color
+
+    # --- Melodic House & Techno loopers (most → least popular) ---
+    ["I","IV","V"],                           # 16 house/pop bed
+    ["I","IV","I","V"],                       # 17 steady build
+    ["I","IV","I","IV"],                      # 18 trancey pad bed
+    ["I","IV","vi","iii"],                    # 19 color turn
+    ["I","I","IV","V"],                       # 20 basic rock canvas (works as looper)
+    ["ii","IV","I","V"],                      # 21 pop/jazz cross
+    ["V","IV","I"],                           # 22 turnaround
+    ["I","IV","V","IV"],                      # 23 loopable
+    ["I","vi"],                               # 24 two-chord pad
+    ["I","V"],                                # 25 build anchor
+    ["IV","I","V"],                           # 26 mixture: III (borrowed), iv (borrowed)
+    ["I","III","IV","iv"],                    # 27 borrowed iv color
+    ["iv","III","II","I"],                    # 28 Andalusian-like (borrowed)
+    ["I","V","IV","IV"],                      # 29 driving loop
+    ["I","V","vi","iii","IV","I","IV","V"],   # 30 Canon cycle
+]
 
 # -----------------------
 # Progression set (minor key, Aeolian feel)
@@ -139,6 +207,8 @@ def pick_progressions(mode: str):
         return PROGRESSIONS_PHRYGIAN
     if mode == "persian":
         return PROGRESSIONS_PERSIAN
+    if mode == "major":
+        return PROGRESSIONS_IONIAN
     return PROGRESSIONS_AEOLIAN
 
 NOTE_NAMES_SHARP = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
@@ -146,6 +216,7 @@ NAME_TO_PC = {n:i for i,n in enumerate(NOTE_NAMES_SHARP)}
 
 # Diatonic semitone steps (degrees 1..7) per mode
 SCALE_STEPS = {
+    "major":  [0,2,4,5,7,9,11],   # major (Ionian)
     "aeolian":  [0,2,3,5,7,8,10],   # natural minor
     "dorian":   [0,2,3,5,7,9,10],   # raised 6
     "phrygian": [0,1,3,5,7,8,10],   # flat 2
@@ -154,12 +225,14 @@ SCALE_STEPS = {
 
 # Triad and 7th qualities per degree (1..7) by mode
 TRIAD_QUALITIES = {
+    "major":  ["maj","min","min","maj","maj","min","dim"],
     "aeolian":  ["min","dim","maj","min","min","maj","maj"],
     "dorian":   ["min","min","maj","maj","min","dim","maj"],
     "phrygian": ["min","maj","maj","min","dim","maj","maj"],
     "persian":  ["min","dim","maj","min","min","maj","maj"],  # natural minor; use uppercase V for dominant
 }
 SEVENTH_QUALITIES = {
+    "major":  ["maj7","min7","min7","maj7","dom7","min7","half-dim7"],
     "aeolian":  ["min7","half-dim7","maj7","min7","min7","maj7","dom7"],
     "dorian":   ["min7","min7","maj7","maj7","min7","half-dim7","dom7"],
     "phrygian": ["min7","maj7","maj7","min7","half-dim7","maj7","dom7"],
@@ -172,10 +245,12 @@ SEVENTH_QUALITIES = {
 def _safe_meta_text(s: str) -> str:
     if not isinstance(s, str):
         s = str(s)
-    s = (s.replace("—","-")
-           .replace("–","-")
-           .replace("♭","b")
-           .replace("♯","#"))
+    # Normalize to ASCII-safe characters for Mido's latin-1 expectation
+    s = (s.replace("—", "-")
+           .replace("–", "-")
+           .replace("♭", "b")
+           .replace("♯", "#")
+           .replace("°", "o"))  # avoid latin-1 error
     try:
         return s.encode('latin-1', 'ignore').decode('latin-1')
     except Exception:
@@ -249,6 +324,18 @@ def build_chord_pcs(tonic_pc: int, mode: str, roman: str, use_7ths: bool, add9: 
         qual = "dom7" if use_7ths else "maj"
     else:
         qual = degree_quality(mode, deg, use_7ths)
+    # In Ionian (major), allow case of roman to force borrowed quality
+    base_case = base  # e.g., 'IV', 'iv', 'III', etc.
+    if mode == "major":
+        if "°" in roman:
+            qual = "dim7" if use_7ths else "dim"
+        else:
+            if base_case.isupper():
+                # force major/maj7 (V already handled above)
+                qual = "maj7" if use_7ths else "maj"
+            elif base_case.islower():
+                # force minor/min7
+                qual = "min7" if use_7ths else "min"
 
     def pcs_from_quality(root_pc, qual):
         if qual in ("min","min7"):
@@ -835,7 +922,7 @@ def main():
     ap = argparse.ArgumentParser(description="Melodic House & Techno progression pack generator (Aeolian/Dorian/Phrygian/Persian)")
     ap.add_argument("--keys", default="G#m,F#m,Em,D#m,C#m,Am,Gm,Fm,D,C#,E,G",
                     help="Comma-separated list of keys (e.g., 'G#m,Am,F#m')")
-    ap.add_argument("--mode", default="aeolian", choices=["aeolian","dorian","phrygian","persian"], help="Harmonic mode")
+    ap.add_argument("--mode", default="major", choices=["major","aeolian","dorian","phrygian","persian"], help="Harmonic mode")
     ap.add_argument("--bpm", type=int, default=122)
     ap.add_argument("--bars", type=int, default=1, help="Bars per chord")
     ap.add_argument("--oct", type=int, default=3, help="Base octave for chord stack")

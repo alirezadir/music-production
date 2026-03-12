@@ -1,0 +1,19 @@
+# Media Downloader – Links File
+# =============================
+# One URL per line.  Optionally add "audio" or "video" after the URL.
+# Default format is "audio" if not specified.
+#
+# Supported platforms:
+#   - YouTube  (youtube.com, youtu.be)
+#   - Instagram (instagram.com)
+#
+# Lines starting with '#' are comments.
+# Lines ending with ' ✓' are already downloaded (auto-marked by the script).
+#
+# Examples:
+# https://www.youtube.com/watch?v=dQw4w9WgXcQ audio
+# https://www.youtube.com/watch?v=dQw4w9WgXcQ video
+# https://youtu.be/dQw4w9WgXcQ
+# https://www.instagram.com/reel/ABC123/ audio
+# https://www.instagram.com/reel/ABC123/ video
+# https://www.instagram.com/p/XYZ789/ audio

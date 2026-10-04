@@ -80,7 +80,7 @@ The upstream generic script also lists `lynx` for voice cleaning and `lyra` for 
 Requires Python 3.10+ and `requests`.
 
 ```bash
-cd stemming/lalali-v1
+cd stemming/lalalai-v1
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -190,7 +190,7 @@ The relevant current examples live in `api-v1/python/`. A snapshot of those offi
 To replace the snapshot with a literal fresh clone locally:
 
 ```bash
-cd stemming/lalali-v1
+cd stemming/lalalai-v1
 rm -rf lalalai
 git clone https://github.com/OmniSaleGmbH/lalalai.git
 ```

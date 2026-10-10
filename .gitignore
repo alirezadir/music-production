@@ -169,5 +169,34 @@ cython_debug/
 **/_*
 _*
 _*/
+# ...but never hide Python source (__init__.py, __main__.py, _helpers.py)
+!_*.py
+
+# Generated output / temp
+output/
+outputs/
+.tmp_*/
+**/out/
+plugins/crash_analyzer/Live Reports/
+plugins/plugin_analyzer/Plugin_List_*/
+*.db
+*.inspect.ndjson
+
+# Node / build
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Local tool settings & sessions
+**/.claude/settings.local.json
+**/browser-profile/
+
+# iCloud / Finder conflict copies
+* 2.*
+
+# Separate projects living here until split into their own repos
+Latr/
+iggrow/
+mcp/ableton-mcp/
 
 

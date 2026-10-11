@@ -1,0 +1,26 @@
+{
+  "a_level_labels": [
+    "Afterlife Records",
+    "Anjunadeep",
+    "Toolroom",
+    "Keinemusik",
+    "Stil Vor Talent"
+  ],
+  "a_level_label_urls": {
+    "Afterlife Records": "https://www.beatport.com/label/afterlife-records/56958",
+    "Anjunadeep": "https://www.beatport.com/label/anjunadeep/1390",
+    "Toolroom": "https://www.beatport.com/label/toolroom/495",
+    "Keinemusik": "https://www.beatport.com/label/keinemusik/12792",
+    "Stil Vor Talent": "https://www.beatport.com/label/stil-vor-talent/1938"
+  },
+  "exclude_labels": [
+    "Afterlife Records",
+    "Anjunadeep",
+    "Toolroom",
+    "Keinemusik",
+    "Stil Vor Talent"
+  ],
+  "tracks_per_page": 50,
+  "b_labels_per_a_label": 5
+}
+

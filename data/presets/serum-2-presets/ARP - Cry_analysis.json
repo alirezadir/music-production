@@ -1,0 +1,39 @@
+{
+  "preset_info": {
+    "format": "serumpreset",
+    "file_name": "ARP - Cry.SerumPreset",
+    "file_path": "../../music-production/presets/serum-2-presets/ARP - Cry.SerumPreset",
+    "file_size": 3749,
+    "preset_name": "ARP - Cry",
+    "preset_author": "TPS",
+    "preset_description": "Put on the root note of your track",
+    "product": "Serum2",
+    "product_version": "2.0.16",
+    "tags": [
+      "Wavetable",
+      "Poly",
+      "Arp",
+      "Preview"
+    ]
+  },
+  "format_details": {
+    "format": "serumpreset",
+    "can_extract_parameters": false
+  },
+  "preset_metadata": {
+    "name": "ARP - Cry",
+    "author": "TPS",
+    "description": "Put on the root note of your track",
+    "tags": [
+      "Wavetable",
+      "Poly",
+      "Arp",
+      "Preview"
+    ],
+    "product_version": "2.0.16"
+  },
+  "parameter_summary": {
+    "has_parameters": false,
+    "parameter_count": 0
+  }
+}

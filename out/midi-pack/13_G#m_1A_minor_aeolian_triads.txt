@@ -1,3 +1,0 @@
-Key=G#m Mode=aeolian
-
-i:G#/B/D# | iv:C#/E/G# | VII:F#/A#/C# | i:G#/B/D#

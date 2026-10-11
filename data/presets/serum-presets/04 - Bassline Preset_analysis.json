@@ -1,0 +1,22 @@
+{
+  "preset_info": {
+    "format": "fxp",
+    "file_name": "04 - Bassline Preset.fxp",
+    "file_path": "../../music-production/presets/serum-presets/04 - Bassline Preset.fxp",
+    "file_size": 5712,
+    "preset_name": "04 - Bassline Preset",
+    "chunk_size": 5712
+  },
+  "format_details": {
+    "format": "fxp",
+    "can_extract_parameters": true
+  },
+  "preset_metadata": {
+    "name": "04 - Bassline Preset",
+    "chunk_size": 5712
+  },
+  "data_analysis": {
+    "has_compressed_data": true,
+    "compressed_size": 5697
+  }
+}

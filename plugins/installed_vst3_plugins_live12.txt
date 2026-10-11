@@ -1,0 +1,204 @@
+# Installed VST3 plugins — user + system macOS folders
+# Ableton Live 12 — 2026-04-09T05:52:17Z
+
+Directory /Users/alirezadirafzoon/Library/Audio/Plug-Ins/VST3 does not exist.
+Listing VST3 plugins in /Library/Audio/Plug-Ins/VST3:
+ADPTR MetricAB.vst3
+ADSR Sample Manager.vst3
+ANIMATE.vst3
+ARP 2600 V3.vst3
+Acid V.vst3
+Analog Lab V.vst3
+Augmented BRASS.vst3
+Augmented GRAND PIANO.vst3
+Augmented STRINGS.vst3
+Augmented VOICES.vst3
+Augmented WOODWINDS.vst3
+Auto-Key.vst3
+Auto-Tune Pro.vst3
+B-3 V2.vst3
+BASSROOM.vst3
+Black Box Analog Design HG-2.vst3
+Buchla Easel V.vst3
+CMI V.vst3
+CP-70 V.vst3
+CS-80 V4.vst3
+CZ V.vst3
+Captain Beat Epic.vst3
+Captain Chords Epic.vst3
+Captain Deep Epic.vst3
+Captain Melody Epic.vst3
+Captain Play Epic.vst3
+Clavinet V.vst3
+DS Tantra 2.vst3
+DX7 V.vst3
+Diva.vst3
+DrumGPT.vst3
+Elevate.vst3
+Emulator II V.vst3
+Eventide
+FASTERMASTER.vst3
+FUSER.vst3
+FabFilter Micro.vst3
+FabFilter One.vst3
+FabFilter Pro-C 3.vst3
+FabFilter Pro-DS.vst3
+FabFilter Pro-G.vst3
+FabFilter Pro-L 2.vst3
+FabFilter Pro-MB.vst3
+FabFilter Pro-Q 3.vst3
+FabFilter Pro-Q 4.vst3
+FabFilter Pro-R 2.vst3
+FabFilter Saturn 2.vst3
+FabFilter Simplon.vst3
+FabFilter Timeless 3.vst3
+FabFilter Twin 3.vst3
+FabFilter Volcano 3.vst3
+Fadr Stems.vst3
+Farfisa V.vst3
+Insight 2.vst3
+Invisible_Limiter.vst3
+Invisible_Limiter_G2.vst3
+Invisible_Limiter_G3.vst3
+Invisible_Limiter_LL.vst3
+Jun-6 V.vst3
+Jup-8 V4.vst3
+KORG MS-20 V.vst3
+Kickstart 2.vst3
+Kilohearts
+Kontakt 8.vst3
+LEVELS.vst3
+LIMITER.vst3
+Limitless.vst3
+MIXROOM.vst3
+MSED.vst3
+Matrix-12 V2.vst3
+Mellotron V.vst3
+Melodyne.vst3
+Mini V4.vst3
+MiniFreak V.vst3
+Mixed In Key SE.vst3
+Modular V3.vst3
+Musio.vst3
+Nectar 4 Auto-Level.vst3
+Nectar 4 Backer.vst3
+Nectar 4 Breath Control.vst3
+Nectar 4 Compressor.vst3
+Nectar 4 DeEsser.vst3
+Nectar 4 Delay.vst3
+Nectar 4 Dimension.vst3
+Nectar 4 Equalizer.vst3
+Nectar 4 Gate.vst3
+Nectar 4 Pitch.vst3
+Nectar 4 Reverb.vst3
+Nectar 4 Saturation.vst3
+Nectar 4 Voices.vst3
+Nectar 4.vst3
+Neoverb.vst3
+Neutron 4 Compressor.vst3
+Neutron 4 Equalizer.vst3
+Neutron 4 Exciter.vst3
+Neutron 4 Gate.vst3
+Neutron 4 Sculptor.vst3
+Neutron 4 Transient Shaper.vst3
+Neutron 4 Unmask.vst3
+Neutron 4 Visual Mixer.vst3
+Neutron 4.vst3
+Neutron 5 Clipper.vst3
+Neutron 5 Visual Mixer.vst3
+Neutron 5.vst3
+Newfangled Audio
+OP-Xa V.vst3
+Ozone 10 Elements.vst3
+Ozone 11 Clarity.vst3
+Ozone 11 Dynamic EQ.vst3
+Ozone 11 Dynamics.vst3
+Ozone 11 Equalizer.vst3
+Ozone 11 Exciter.vst3
+Ozone 11 Imager.vst3
+Ozone 11 Impact.vst3
+Ozone 11 Low End Focus.vst3
+Ozone 11 Master Rebalance.vst3
+Ozone 11 Match EQ.vst3
+Ozone 11 Maximizer.vst3
+Ozone 11 Spectral Shaper.vst3
+Ozone 11 Stabilizer.vst3
+Ozone 11 Vintage Compressor.vst3
+Ozone 11 Vintage EQ.vst3
+Ozone 11 Vintage Limiter.vst3
+Ozone 11 Vintage Tape.vst3
+Ozone 11.vst3
+Piano V3.vst3
+Prophet-5 V.vst3
+Prophet-VS V.vst3
+REFERENCE.vst3
+REFSEND.vst3
+RESO.vst3
+RX 10 Breath Control.vst3
+RX 10 Connect.vst3
+RX 10 De-click.vst3
+RX 10 De-clip.vst3
+RX 10 De-crackle.vst3
+RX 10 De-ess.vst3
+RX 10 De-hum.vst3
+RX 10 De-plosive.vst3
+RX 10 De-reverb.vst3
+RX 10 Guitar De-noise.vst3
+RX 10 Monitor.vst3
+RX 10 Mouth De-click.vst3
+RX 10 Repair Assistant.vst3
+RX 10 Spectral De-noise.vst3
+RX 10 Voice De-noise.vst3
+Raum.vst3
+Rob Papen
+SEM V2.vst3
+SPAN.vst3
+SQ80 V.vst3
+SausageFattener.vst3
+Serum.vst3
+Serum2.vst3
+Seventh Heaven.vst3
+Shadow Hills Mastering Compressor.vst3
+ShaperBox 3.vst3
+Solina V2.vst3
+Soundtoys
+SplitEQ.vst3
+Stage-73 V2.vst3
+Stems.vst3
+Stereo_Imager_D.vst3
+Sugar.vst3
+Supercharger.vst3
+Synclavier V.vst3
+SynthGPT 2.vst3
+Synthi V.vst3
+Trackspacer25.vst3
+Tuned Reverb.vst3
+Unison Bass Dragon.vst3
+Unison MIDI Wizard 2.vst3
+Unison Sound Doctor.vst3
+Universal Audio
+VOX Continental V2.vst3
+ValhallaDelay.vst3
+ValhallaFreqEcho.vst3
+ValhallaRoom.vst3
+ValhallaShimmer.vst3
+ValhallaVintageVerb.vst3
+Vital.vst3
+VocAlign6Pro.vst3
+Vocal Chain.vst3
+Vocal Tune.vst3
+VocalSynth 2.vst3
+Vocoder V.vst3
+WaveObserver.vst3
+WaveShell1-VST3 14.12.vst3
+WaveShell1-VST3 16.0.vst3
+WaveShell1-VST3 16.7.vst3
+Wurli V3.vst3
+bx_digital V3 mix.vst3
+bx_digital V3.vst3
+bx_limiter.vst3
+create-tree.sh
+dubler-midi-capture.vst3
+file_tree.txt
+soothe2.vst3
+uaudio_teletronix_la-2a_tc.vst3

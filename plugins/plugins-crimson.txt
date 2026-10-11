@@ -1,0 +1,36 @@
+Recommended plugins from Crimson:
+
+FabFilter Bundle (Pro-Q 4 etc.)
+Soundtoys Bundle (Decapitator etc.)
+Elevate Mastering Bundle (Newfangled Audio)
+ShaperBox 3 Bundle
+Valhalla VintageVerb
+Valhalla Room
+Valhalla Shimmer
+Soothe 2
+Trackspacer
+Kickstart 2
+Metric AB (ADPTR)
+SplitEQ
+Ozone
+Melodyne
+Antares Auto-Tune
+FUSER
+Raum
+Neutron Transient Shaper
+Seventh Heaven Reverb
+Shadow Hills Mastering Compressor
+Black Box Analog Design HG-2
+bx_digital V3
+bx_limiter
+Maag EQ6
+Sugar
+Limitless
+Invisible Limiter
+LoAir
+NLS Buss
+S1 Stereo Imager
+VocAlign 6 Pro
+Waves C4
+Waves Rvox
+Waves CLA Vocals

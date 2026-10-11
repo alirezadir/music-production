@@ -20,19 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import sys
-
-if sys.version_info >= (3, 13):
-    raise RuntimeError("This script requires Python 3.12 or earlier for cgi module compatibility. Actual version is: ", sys.version_info)
-
-
-import cgi
-import json
 import os
+import sys
 import time
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, SUPPRESS
-from urllib.parse import quote, unquote, urlencode
-from urllib.request import urlopen, Request
+from dataclasses import dataclass
+from email.message import EmailMessage
+from urllib.parse import quote, unquote
+
+try:
+    import requests
+except ImportError:
+    print("ERROR: requests library is required. Install it with: pip install requests")
+    sys.exit(1)
+
 from tqdm import tqdm
 
 # Try to import dotenv, but don't fail if it's not installed
@@ -44,29 +45,78 @@ except ImportError:
     print("Warning: python-dotenv not installed. Install with: pip install python-dotenv")
 
 
-URL_API = "https://www.lalal.ai/api/"
+URL_API = "https://www.lalal.ai/api/v1/"
 
-_perseus_stems = ('vocals', 'voice', 'drum', 'piano', 'bass', 'electric_guitar', 'acoustic_guitar')
-_orion_stems = ('vocals', 'voice', 'drum', 'piano', 'bass', 'electric_guitar', 'acoustic_guitar')
-_phoenix_stems = ('vocals', 'voice', 'drum', 'piano', 'bass', 'electric_guitar', 'acoustic_guitar', 'synthesizer', 'strings', 'wind')
+# Stem definitions by endpoint
+_voice_clean_stems = ("voice",)
+_demuser_stems = ("music",)
+_stem_separator_stems = (
+    "vocals",
+    "drum",
+    "piano",
+    "bass",
+    "electric_guitar",
+    "acoustic_guitar",
+    "synthesizer",
+    "strings",
+    "wind",
+)
 
-# Define all available stems (excluding 'voice' for the 'all' option)
-_all_stems = ('vocals', 'drum', 'piano', 'bass', 'electric_guitar', 'acoustic_guitar', 'synthesizer', 'strings', 'wind')
+# All stems available for --stem all (excludes 'voice' and 'music' which are special-purpose)
+_all_stems = _stem_separator_stems
 
+
+# ---------------------------------------------------------------------------
+# Params dataclasses
+# ---------------------------------------------------------------------------
+
+@dataclass
+class VoiceCleanParams:
+    """Parameters for /split/voice_clean/ endpoint."""
+    source_id: str
+    noise_cancelling_level: int  # 0, 1, or 2
+    dereverb_enabled: bool = False
+    splitter: str = "auto"
+
+
+@dataclass
+class DemuserParams:
+    """Parameters for /split/demuser/ endpoint."""
+    source_id: str
+    dereverb_enabled: bool = False
+
+
+@dataclass
+class StemSeparatorParams:
+    """Parameters for /split/stem_separator/ endpoint."""
+    source_id: str
+    stem: str
+    extraction_level: str  # deep_extraction or clear_cut
+    dereverb_enabled: bool = False
+    multivocal: str | None = None  # lead_back for vocals stem only
+    splitter: str = "auto"
+
+
+# ---------------------------------------------------------------------------
+# License loading
+# ---------------------------------------------------------------------------
 
 def load_license():
     """Load license key from environment variable or .env file."""
-    # Load .env file if dotenv is available
     if DOTENV_AVAILABLE:
         load_dotenv()
-    
-    # Get license from environment variable
     license_key = os.getenv('LALALAI_LICENSE')
     if license_key:
         return license_key
-    
-    raise FileNotFoundError("LALALAI_LICENSE environment variable not found. Please set it in your .env file or environment variables.")
+    raise FileNotFoundError(
+        "LALALAI_LICENSE environment variable not found. "
+        "Please set it in your .env file or environment variables."
+    )
 
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 def check_file_exists(output_path, input_filename, stem):
     """Check if a stem file already exists in the output directory."""
@@ -75,7 +125,7 @@ def check_file_exists(output_path, input_filename, stem):
     return os.path.exists(stem_file)
 
 
-def update_percent(pct):
+def _update_percent(pct):
     pct = str(pct)
     sys.stdout.write("\b" * len(pct))
     sys.stdout.write(" " * len(pct))
@@ -84,343 +134,472 @@ def update_percent(pct):
     sys.stdout.flush()
 
 
-def make_content_disposition(filename, disposition='attachment'):
+def make_content_disposition(filename, disposition="attachment"):
     try:
-        filename.encode('ascii')
+        filename.encode("ascii")
         file_expr = f'filename="{filename}"'
     except UnicodeEncodeError:
         quoted = quote(filename)
         file_expr = f"filename*=utf-8''{quoted}"
-    return f'{disposition}; {file_expr}'
+    return f"{disposition}; {file_expr}"
 
 
-def upload_file(file_path, license):
-    url_for_upload = URL_API + "upload/"
-    _, filename = os.path.split(file_path)
-    headers = {
-        "Content-Disposition": make_content_disposition(filename),
-        "Authorization": f"license {license}",
-    }
-    with open(file_path, 'rb') as f:
-        request = Request(url_for_upload, f, headers)
-        with urlopen(request) as response:
-            upload_result = json.load(response)
-            if upload_result["status"] == "success":
-                return upload_result["id"]
-            else:
-                raise RuntimeError(upload_result["error"])
-
-
-def split_file(file_id, license, stem, splitter, enhanced_processing, noise_cancelling, dereverb_enabled):
-    url_for_split = URL_API + "split/"
-    headers = {
-        "Authorization": f"license {license}",
-    }
-    query_args = {
-        'id': file_id,
-        'stem': stem,
-        'splitter': splitter,
-        'dereverb_enabled': dereverb_enabled,
-    }
-
-    if enhanced_processing is not None:
-        query_args['enhanced_processing_enabled'] = enhanced_processing
-    if noise_cancelling is not None:
-        query_args['noise_cancelling_level'] = noise_cancelling
-
-    # What you send to server
-    print("Split task request body:", query_args)
-
-    encoded_args = urlencode(query_args).encode('utf-8')
-    request = Request(url_for_split, encoded_args, headers=headers)
-    with urlopen(request) as response:
-        split_result = json.load(response)
-        if split_result["status"] == "error":
-            raise RuntimeError(split_result["error"])
-
-
-def check_file(file_id):
-    url_for_check = URL_API + "check/?"
-    query_args = {'id': file_id}
-    encoded_args = urlencode(query_args)
-
-    is_queueup = False
-
-    while True:
-        with urlopen(url_for_check + encoded_args) as response:
-            check_result = json.load(response)
-
-        if check_result["status"] == "error":
-            raise RuntimeError(check_result["error"])
-
-        task_state = check_result["task"]["state"]
-
-        if task_state == "success":
-            update_percent("Progress: 100%\n")
-            return check_result["split"]
-
-        elif task_state == "error":
-            raise RuntimeError(check_result["task"]["error"])
-
-        elif task_state == "progress":
-            progress = int(check_result["task"]["progress"])
-            if progress == 0 and not is_queueup:
-                if 'presets' in check_result and 'split' in check_result['presets']:
-                    # Settings extracted by server
-                    print("Using settings", check_result['presets']['split'])
-                print("Queue up...")
-                is_queueup = True
-            elif progress > 0:
-                update_percent(f"Progress: {progress}%")
-
-        else:
-            raise NotImplementedError('Unknown track state', task_state)
-
-        time.sleep(15)
+def get_filename_from_content_disposition(header):
+    """Parse Content-Disposition header to extract filename (RFC 5987 safe)."""
+    msg = EmailMessage()
+    msg["content-disposition"] = header
+    filename = msg.get_filename()
+    if filename:
+        return filename
+    # Fallback: manual parsing for RFC 5987 encoded filenames
+    if "filename*=" in header:
+        for raw_segment in header.split(";"):
+            segment = raw_segment.strip()
+            if segment.startswith("filename*="):
+                encoded = segment.split("=", 1)[1]
+                if "''" in encoded:
+                    encoding, quoted = encoded.split("''", 1)
+                    return unquote(quoted, encoding)
+    raise ValueError("Invalid header Content-Disposition")
 
 
 def _strtobool(val: str) -> bool:
-    """Convert a string representation of truth to true (1) or false (0).
-
-    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
-    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
-    'val' is anything else.
-    """
+    """Convert a string representation of truth to true or false."""
     val = val.lower()
-    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+    if val in ("y", "yes", "t", "true", "on", "1"):
         return True
-    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
+    elif val in ("n", "no", "f", "false", "off", "0"):
         return False
     else:
         raise ValueError(f"invalid bool value {val!r}")
 
 
-def get_filename_from_content_disposition(header):
-    _, params = cgi.parse_header(header)
-    filename = params.get('filename')
-    if filename:
-        return filename
-    filename = params.get('filename*')
-    if filename:
-        encoding, quoted = filename.split("''")
-        unquoted = unquote(quoted, encoding)
-        return unquoted
-    raise ValueError('Invalid header Content-Disposition')
+# ---------------------------------------------------------------------------
+# API calls — v1
+# ---------------------------------------------------------------------------
+
+def upload_file(file_path, license):
+    """Upload file to LALAL.AI v1 API, returns source_id."""
+    url_for_upload = URL_API + "upload/"
+    _, filename = os.path.split(file_path)
+    headers = {
+        "Content-Disposition": make_content_disposition(filename),
+        "X-License-Key": license,
+    }
+    with open(file_path, "rb") as f:
+        response = requests.post(url_for_upload, data=f, headers=headers, timeout=30)
+    if response.status_code != 200:
+        raise RuntimeError(f"Upload failed: {response.status_code} - {response.text}")
+    upload_result = response.json()
+    if upload_result.get("status") == "error":
+        raise RuntimeError(upload_result.get("error", "Unknown upload error"))
+    return upload_result["id"]
 
 
-def download_file(url_for_download, output_path):
-    with urlopen(url_for_download) as response:
-        filename = get_filename_from_content_disposition(response.headers["Content-Disposition"])
-        file_path = os.path.join(output_path, filename)
-        with open(file_path, 'wb') as f:
-            while (chunk := response.read(8196)):
+def _split_voice_clean(params: VoiceCleanParams, license: str) -> str:
+    """Start voice cleaning task, returns task_id."""
+    url = URL_API + "split/voice_clean/"
+    headers = {"X-License-Key": license}
+    presets = {
+        "stem": "voice",
+        "noise_cancelling_level": params.noise_cancelling_level,
+        "splitter": params.splitter,
+    }
+    if params.dereverb_enabled:
+        presets["dereverb_enabled"] = True
+    body = {"source_id": params.source_id, "presets": presets}
+    print("Split task request body:", body)
+    response = requests.post(url, json=body, headers=headers, timeout=30)
+    if response.status_code != 200:
+        raise RuntimeError(f"Split failed: {response.status_code} - {response.text}")
+    return response.json()["task_id"]
+
+
+def _split_demuser(params: DemuserParams, license: str) -> str:
+    """Start music removal (demuser) task, returns task_id."""
+    url = URL_API + "split/demuser/"
+    headers = {"X-License-Key": license}
+    presets: dict = {"stem": "music"}
+    if params.dereverb_enabled:
+        presets["dereverb_enabled"] = True
+    body = {"source_id": params.source_id, "presets": presets}
+    print("Split task request body:", body)
+    response = requests.post(url, json=body, headers=headers, timeout=30)
+    if response.status_code != 200:
+        raise RuntimeError(f"Split failed: {response.status_code} - {response.text}")
+    return response.json()["task_id"]
+
+
+def _split_stem_separator(params: StemSeparatorParams, license: str) -> str:
+    """Start stem separation task, returns task_id."""
+    url = URL_API + "split/stem_separator/"
+    headers = {"X-License-Key": license}
+    presets = {
+        "stem": params.stem,
+        "extraction_level": params.extraction_level,
+        "splitter": params.splitter,
+    }
+    if params.dereverb_enabled:
+        presets["dereverb_enabled"] = True
+    if params.multivocal and params.stem == "vocals":
+        presets["multivocal"] = params.multivocal
+    body = {"source_id": params.source_id, "presets": presets}
+    print("Split task request body:", body)
+    response = requests.post(url, json=body, headers=headers, timeout=30)
+    if response.status_code != 200:
+        raise RuntimeError(f"Split failed: {response.status_code} - {response.text}")
+    return response.json()["task_id"]
+
+
+def build_split_params(
+    source_id: str,
+    stem: str,
+    noise_cancelling: int,
+    dereverb_enabled: bool,
+    extraction_level: str,
+    multivocal: str | None,
+    splitter: str,
+) -> VoiceCleanParams | DemuserParams | StemSeparatorParams:
+    """Build appropriate params object based on stem type."""
+    if stem == "voice":
+        return VoiceCleanParams(
+            source_id=source_id,
+            noise_cancelling_level=noise_cancelling,
+            dereverb_enabled=dereverb_enabled,
+            splitter=splitter,
+        )
+    elif stem == "music":
+        return DemuserParams(
+            source_id=source_id,
+            dereverb_enabled=dereverb_enabled,
+        )
+    else:
+        return StemSeparatorParams(
+            source_id=source_id,
+            stem=stem,
+            extraction_level=extraction_level,
+            dereverb_enabled=dereverb_enabled,
+            multivocal=multivocal,
+            splitter=splitter,
+        )
+
+
+def split_file(params, license: str) -> str:
+    """Dispatch to the correct split endpoint and return task_id."""
+    if isinstance(params, VoiceCleanParams):
+        return _split_voice_clean(params, license)
+    elif isinstance(params, DemuserParams):
+        return _split_demuser(params, license)
+    elif isinstance(params, StemSeparatorParams):
+        return _split_stem_separator(params, license)
+    else:
+        raise ValueError(f"Unsupported params type: {type(params)}")
+
+
+def check_task(task_id: str, license: str) -> dict:
+    """Poll /check/ until task completes, returns result dict with 'tracks' list."""
+    url_for_check = URL_API + "check/"
+    headers = {"X-License-Key": license}
+    body = {"task_ids": [task_id]}
+    is_queued = False
+
+    while True:
+        response = requests.post(url_for_check, json=body, headers=headers, timeout=30)
+        if response.status_code != 200:
+            raise RuntimeError(f"Check failed: {response.status_code} - {response.text}")
+
+        check_result = response.json()
+        if task_id not in check_result.get("result", {}):
+            raise RuntimeError(f"Task {task_id} not found in response")
+
+        task_status = check_result["result"][task_id]
+        status = task_status.get("status")
+
+        if status == "success":
+            _update_percent("Progress: 100%\n")
+            print("Using settings:", task_status.get("presets"))
+            return task_status["result"]
+        elif status == "cancelled":
+            raise RuntimeError("Task was cancelled")
+        elif status == "error":
+            raise RuntimeError(task_status.get("error", "Unknown task error"))
+        elif status == "progress":
+            progress = int(task_status.get("progress", 0))
+            if progress == 0 and not is_queued:
+                print("Task queued, processing...")
+                print("Using settings:", task_status.get("presets"))
+                is_queued = True
+            elif progress > 0:
+                _update_percent(f"Progress: {progress}%")
+        else:
+            raise RuntimeError(f"Unknown task status: {status}")
+
+        time.sleep(5)
+
+
+def download_file(url_for_download: str, output_path: str) -> str:
+    """Download a file from URL and save to output_path, return local file path."""
+    response = requests.get(url_for_download, stream=True, timeout=60)
+    if response.status_code != 200:
+        raise RuntimeError(f"Download failed: {response.status_code}")
+    content_disp = response.headers.get("Content-Disposition", "")
+    filename = get_filename_from_content_disposition(content_disp)
+    file_path = os.path.join(output_path, filename)
+    with open(file_path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
                 f.write(chunk)
     return file_path
 
 
-def batch_process_for_file(license, input_path, output_path, stem, splitter, enhanced_processing, noise_cancelling, dereverb_enabled):
+def delete_tracks(source_id: str, license: str):
+    """Delete source file and all resulting tracks from LALAL.AI storage."""
+    url_for_delete = URL_API + "delete/"
+    headers = {"X-License-Key": license}
+    response = requests.post(
+        url_for_delete, json={"source_id": source_id}, headers=headers, timeout=30
+    )
+    if response.status_code != 200:
+        raise RuntimeError(f"Delete failed: {response.status_code} - {response.text}")
+
+
+# ---------------------------------------------------------------------------
+# Batch processing
+# ---------------------------------------------------------------------------
+
+def _process_single_stem(
+    license, source_id, input_filename, output_path, stem,
+    noise_cancelling, dereverb_enabled, extraction_level, multivocal,
+    delete, splitter,
+):
+    """Upload already done — split, check, download for one stem."""
+    if check_file_exists(output_path, input_filename, stem):
+        print(f"Stem '{stem}' already exists for {input_filename}, skipping...")
+        return
+
+    params = build_split_params(
+        source_id, stem, noise_cancelling, dereverb_enabled,
+        extraction_level, multivocal, splitter,
+    )
+    task_id = split_file(params, license)
+    print(f"Task started (task_id: {task_id})")
+    split_result = check_task(task_id, license)
+
+    for track in split_result["tracks"]:
+        url = track["url"]
+        label = track.get("label", stem)
+        print(f'Downloading {label} track from "{url}"...')
+        downloaded_file = download_file(url, output_path)
+        print(f'Downloaded to "{downloaded_file}"')
+
+
+def batch_process_for_file(
+    license, input_path, output_path, stem,
+    noise_cancelling, dereverb_enabled, extraction_level, multivocal,
+    delete, splitter,
+):
+    """Process a single file: upload once, then split for requested stem(s)."""
     try:
         input_filename = os.path.basename(input_path)
-        
-        # Check if stem already exists
-        if check_file_exists(output_path, input_filename, stem):
-            print(f"Stem {stem} already exists for {input_filename}, skipping...")
-            return
-        
-        print(f'Uploading the file "{input_path}"...')
-        file_id = upload_file(file_path=input_path, license=license)
-        print(f'The file "{input_path}" has been successfully uploaded (file id: {file_id})')
+        print(f'Uploading "{input_path}"...')
+        source_id = upload_file(file_path=input_path, license=license)
+        print(f'Uploaded successfully (source_id: {source_id})')
 
-        print(f'Processing the file "{input_path}"...')
-        split_file(file_id, license, stem, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
-        split_result = check_file(file_id)
-
-        for url in (split_result['stem_track'], split_result['back_track']):
-            print(f'Downloading the track file "{url}"...')
-            downloaded_file = download_file(url, output_path)
-            print(f'The track file has been downloaded to "{downloaded_file}"')
-
-        print(f'The file "{input_path}" has been successfully split')
-    except Exception as err:
-        print(f'Cannot process the file "{input_path}": {err}')
-
-
-def batch_process_selected_stems(license, input_path, output_path, stems_list, splitter, enhanced_processing, noise_cancelling, dereverb_enabled):
-    """Process selected stems for a single file."""
-    try:
-        input_filename = os.path.basename(input_path)
-        print(f'Uploading the file "{input_path}"...')
-        file_id = upload_file(file_path=input_path, license=license)
-        print(f'The file "{input_path}" has been successfully uploaded (file id: {file_id})')
-
-        # Create progress bar for selected stems
-        with tqdm(total=len(stems_list), desc="Processing stems", unit="stem") as pbar:
-            for stem in stems_list:
-                print(f"\n{'='*50}")
-                print(f"Splitting {stem}:")
-                print(f"{'='*50}")
-                
-                # Check if stem already exists
-                if check_file_exists(output_path, input_filename, stem):
-                    print(f"Stem {stem} already exists, skipping...")
-                    pbar.update(1)
-                    continue
-                
-                split_file(file_id, license, stem, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
-                split_result = check_file(file_id)
-
-                for url in (split_result['stem_track'], split_result['back_track']):
-                    print(f'Downloading the {stem} track file "{url}"...')
-                    downloaded_file = download_file(url, output_path)
-                    print(f'The {stem} track file has been downloaded to "{downloaded_file}"')
-
-                pbar.update(1)
-
-        print(f'\nSelected stems for file "{input_path}" have been successfully processed')
-    except Exception as err:
-        print(f'Cannot process the file "{input_path}": {err}')
-
-
-def batch_process_all_stems(license, input_path, output_path, splitter, enhanced_processing, noise_cancelling, dereverb_enabled):
-    """Process all stems for a single file."""
-    try:
-        input_filename = os.path.basename(input_path)
-        print(f'Uploading the file "{input_path}"...')
-        file_id = upload_file(file_path=input_path, license=license)
-        print(f'The file "{input_path}" has been successfully uploaded (file id: {file_id})')
-
-        # Create progress bar for all stems
-        with tqdm(total=len(_all_stems), desc="Processing stems", unit="stem") as pbar:
-            for stem in _all_stems:
-                print(f"\n{'='*50}")
-                print(f"Splitting {stem}:")
-                print(f"{'='*50}")
-                
-                # Check if stem already exists
-                if check_file_exists(output_path, input_filename, stem):
-                    print(f"Stem {stem} already exists, skipping...")
-                    pbar.update(1)
-                    continue
-                
-                split_file(file_id, license, stem, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
-                split_result = check_file(file_id)
-
-                for url in (split_result['stem_track'], split_result['back_track']):
-                    print(f'Downloading the {stem} track file "{url}"...')
-                    downloaded_file = download_file(url, output_path)
-                    print(f'The {stem} track file has been downloaded to "{downloaded_file}"')
-
-                pbar.update(1)
-
-        print(f'\nAll stems for file "{input_path}" have been successfully processed')
-    except Exception as err:
-        print(f'Cannot process the file "{input_path}": {err}')
-
-
-def batch_process(license, input_path, output_path, stem, splitter, enhanced_processing, noise_cancelling, dereverb_enabled):
-    if os.path.isfile(input_path):
-        if stem == 'all':
-            batch_process_all_stems(license, input_path, output_path, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
-        elif ',' in stem:
-            # Handle comma-separated stems
-            stems_list = [s.strip() for s in stem.split(',')]
-            batch_process_selected_stems(license, input_path, output_path, stems_list, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
+        if stem == "all":
+            _batch_all_stems(
+                license, source_id, input_filename, output_path,
+                noise_cancelling, dereverb_enabled, extraction_level,
+                multivocal, delete, splitter,
+            )
+        elif "," in stem:
+            stems_list = [s.strip() for s in stem.split(",")]
+            _batch_selected_stems(
+                license, source_id, input_filename, output_path, stems_list,
+                noise_cancelling, dereverb_enabled, extraction_level,
+                multivocal, delete, splitter,
+            )
         else:
-            batch_process_for_file(license, input_path, output_path, stem, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
+            print(f'Processing stem "{stem}"...')
+            _process_single_stem(
+                license, source_id, input_filename, output_path, stem,
+                noise_cancelling, dereverb_enabled, extraction_level,
+                multivocal, delete, splitter,
+            )
+            print(f'Successfully split "{input_path}"')
+
+        if delete:
+            print(f"Deleting files from LALAL.AI storage (source_id: {source_id})...")
+            delete_tracks(source_id, license)
+            print("Deleted from storage.")
+
+    except Exception as err:
+        print(f'Cannot process "{input_path}": {err}')
+
+
+def _batch_all_stems(
+    license, source_id, input_filename, output_path,
+    noise_cancelling, dereverb_enabled, extraction_level,
+    multivocal, delete, splitter,
+):
+    """Process all instrument stems for an already-uploaded file."""
+    with tqdm(total=len(_all_stems), desc="Processing stems", unit="stem") as pbar:
+        for stem in _all_stems:
+            print(f"\n{'='*50}\nSplitting '{stem}':\n{'='*50}")
+            try:
+                _process_single_stem(
+                    license, source_id, input_filename, output_path, stem,
+                    noise_cancelling, dereverb_enabled, extraction_level,
+                    multivocal, delete, splitter,
+                )
+            except Exception as err:
+                print(f"Error on stem '{stem}': {err}")
+            pbar.update(1)
+    print(f'\nAll stems for "{input_filename}" processed.')
+
+
+def _batch_selected_stems(
+    license, source_id, input_filename, output_path, stems_list,
+    noise_cancelling, dereverb_enabled, extraction_level,
+    multivocal, delete, splitter,
+):
+    """Process a specific list of stems for an already-uploaded file."""
+    with tqdm(total=len(stems_list), desc="Processing stems", unit="stem") as pbar:
+        for stem in stems_list:
+            print(f"\n{'='*50}\nSplitting '{stem}':\n{'='*50}")
+            try:
+                _process_single_stem(
+                    license, source_id, input_filename, output_path, stem,
+                    noise_cancelling, dereverb_enabled, extraction_level,
+                    multivocal, delete, splitter,
+                )
+            except Exception as err:
+                print(f"Error on stem '{stem}': {err}")
+            pbar.update(1)
+    print(f'\nSelected stems for "{input_filename}" processed.')
+
+
+def batch_process(
+    license, input_path, output_path, stem,
+    noise_cancelling, dereverb_enabled, extraction_level,
+    multivocal, delete, splitter,
+):
+    """Process file(s) — single file or all files in a directory."""
+    if os.path.isfile(input_path):
+        batch_process_for_file(
+            license, input_path, output_path, stem,
+            noise_cancelling, dereverb_enabled, extraction_level,
+            multivocal, delete, splitter,
+        )
     else:
         for path in os.listdir(input_path):
             full_path = os.path.join(input_path, path)
             if os.path.isfile(full_path):
-                if stem == 'all':
-                    batch_process_all_stems(license, full_path, output_path, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
-                elif ',' in stem:
-                    # Handle comma-separated stems
-                    stems_list = [s.strip() for s in stem.split(',')]
-                    batch_process_selected_stems(license, full_path, output_path, stems_list, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
-                else:
-                    batch_process_for_file(license, full_path, output_path, stem, splitter, enhanced_processing, noise_cancelling, dereverb_enabled)
+                batch_process_for_file(
+                    license, full_path, output_path, stem,
+                    noise_cancelling, dereverb_enabled, extraction_level,
+                    multivocal, delete, splitter,
+                )
 
 
-def _validate_stem(args):
-    if args.stem == 'all':
-        return  # 'all' is always valid
-    
-    # Handle comma-separated stems
-    if ',' in args.stem:
-        stems_list = [s.strip() for s in args.stem.split(',')]
-        for stem in stems_list:
-            if stem not in _all_stems:
-                raise ValueError(f'Invalid stem "{stem}". Should be one of {_all_stems}')
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+def _validate_stem(stem):
+    """Validate stem against all supported v1 API stems."""
+    if stem == "all":
         return
-    
-    # Handle single stem
-    if args.splitter == 'perseus' and args.stem not in _perseus_stems:
-        raise ValueError(f'{args.splitter} splitter does not support stem "{args.stem}". Should be one of {_perseus_stems}')
-    if args.splitter == 'orion' and args.stem not in _orion_stems:
-        raise ValueError(f'{args.splitter} splitter does not support stem "{args.stem}". Should be one of {_orion_stems}')
-    if args.splitter == 'phoenix' and args.stem not in _phoenix_stems:
-        raise ValueError(f'{args.splitter} splitter does not support stem "{args.stem}". Should be one of {_phoenix_stems}')
+    if "," in stem:
+        for s in [x.strip() for x in stem.split(",")]:
+            _validate_stem(s)
+        return
+    valid_stems = _voice_clean_stems + _demuser_stems + _stem_separator_stems
+    if stem not in valid_stems:
+        raise ValueError(f'Unsupported stem "{stem}". Must be one of {valid_stems}')
 
 
-def _get_latest_available_splitter(stem):
-    if stem == 'all':
-        return 'phoenix'  # Use phoenix for 'all' as it supports the most stems
-    if stem in _perseus_stems:
-        return 'perseus'
-    if stem in _orion_stems:
-        return 'orion'
-    return 'phoenix'
+def _validate_multivocal(stem, multivocal):
+    if multivocal and stem != "vocals":
+        raise ValueError(
+            f'--multivocal is only supported for "vocals" stem, not "{stem}"'
+        )
 
 
-splitter_help = f'''
-The type of neural network used to split audio.
-Possible values are 'phoenix', 'orion' or 'perseus'.
-If parameter is not provided - automatically choose most effective splitter for selected stem.
-Perseus stems: {_perseus_stems}.
-Orion stems: {_orion_stems}.
-Phoenix stems: {_phoenix_stems}.'''
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+_splitter_help = (
+    "Splitter model to use. 'auto' selects the latest available model for the stem. "
+    "Choices: auto, orion, perseus, phoenix, andromeda, lynx, lyra."
+)
+
+_stem_choices = list(_voice_clean_stems + _demuser_stems + _stem_separator_stems)
+_stem_help = (
+    'Stem to extract (default: vocals). '
+    'Use "voice" for voice cleaning, "music" to remove background music, '
+    '"all" for all instrument stems, or a comma-separated list (e.g., vocals,drum,bass). '
+    f'Single-stem choices: {_stem_choices}'
+)
 
 
 def main():
-    parser = ArgumentParser(description='Lalalai splitter', formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--input', required=True, type=str, default=SUPPRESS, help='input directory or a file')
-    parser.add_argument('--output', type=str, help='output directory (default: input_directory/stems)')
-    parser.add_argument('--splitter', type=str, choices=['phoenix', 'orion','perseus'], help=splitter_help)
-    parser.add_argument('--stem', type=str, default='all', help='stem to extract (default: all). Can be: all, single stem, or comma-separated list (e.g., vocals,drum,bass)')
-    parser.add_argument('--enhanced-processing', type=lambda x: bool(_strtobool(x)), default=True, choices=[True, False], help='all stems, except "voice"')
-    parser.add_argument('--noise-cancelling', type=int, default=1, choices=[0, 1, 2], help='noise cancelling level for "voice" stem: (0: mild, 1: normal, 2: aggressive)')
-    parser.add_argument('--dereverb_enabled', type=lambda x: bool(_strtobool(x)), default=False, choices=[True, False], help='remove echo')
+    parser = ArgumentParser(
+        description="LALAL.AI splitter — v1 API",
+        formatter_class=ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument("--input", required=True, type=str, default=SUPPRESS,
+                        help="Input directory or file")
+    parser.add_argument("--output", type=str, default=None,
+                        help="Output directory (default: <input_dir>/stems)")
+    parser.add_argument("--stem", type=str, default="vocals", help=_stem_help)
+    parser.add_argument("--noise-cancelling", type=int, default=1, choices=[0, 1, 2],
+                        help='Noise cancelling for "voice" stem (0: mild, 1: normal, 2: aggressive)')
+    parser.add_argument("--dereverb-enabled",
+                        type=lambda x: bool(_strtobool(x)), default=False,
+                        choices=[True, False], help="Remove reverb/echo")
+    parser.add_argument("--extraction-level", type=str, default="deep_extraction",
+                        choices=["deep_extraction", "clear_cut"],
+                        help='"deep_extraction": more detail (may bleed); "clear_cut": cleaner, less detail')
+    parser.add_argument("--multivocal", type=str, default=None, choices=["lead_back"],
+                        help='For "vocals" stem: separate lead and backing vocals')
+    parser.add_argument("--splitter", type=str, default="auto",
+                        choices=["auto", "orion", "perseus", "phoenix", "andromeda", "lynx", "lyra"],
+                        help=_splitter_help)
+    parser.add_argument("--delete",
+                        type=lambda x: bool(_strtobool(x)), default=False,
+                        choices=[True, False],
+                        help="Delete source and output files from LALAL.AI storage after download")
 
     args = parser.parse_args()
 
-    # Load license from environment
+    # Load license from env / .env file
     try:
         license = load_license()
     except Exception as e:
         print(f"Error loading license: {e}")
         return
 
-    # Set default output directory if not provided
+    # Default output dir
     if args.output is None:
-        if os.path.isfile(args.input):
-            input_dir = os.path.dirname(args.input)
-        else:
-            input_dir = args.input
-        args.output = os.path.join(input_dir, 'stems')
+        input_dir = os.path.dirname(args.input) if os.path.isfile(args.input) else args.input
+        args.output = os.path.join(input_dir, "stems")
 
-    _validate_stem(args)
-    args.splitter = args.splitter or _get_latest_available_splitter(args.stem)
+    _validate_stem(args.stem)
+    _validate_multivocal(args.stem, args.multivocal)
 
-    if args.stem == 'voice':
-        args.enhanced_processing = None
-    else:
-        args.noise_cancelling = None
+    # noise_cancelling only relevant for 'voice' stem
+    noise_cancelling = args.noise_cancelling if args.stem == "voice" else 1
 
     os.makedirs(args.output, exist_ok=True)
-    batch_process(license, args.input, args.output, args.stem, args.splitter, args.enhanced_processing, args.noise_cancelling, args.dereverb_enabled)
+    batch_process(
+        license, args.input, args.output, args.stem,
+        noise_cancelling, args.dereverb_enabled, args.extraction_level,
+        args.multivocal, args.delete, args.splitter,
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except Exception as err:

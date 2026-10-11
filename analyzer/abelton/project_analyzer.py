@@ -437,10 +437,15 @@ class AbletonProjectAnalyzer:
             label = node.tag
             user = _value(node.find("./UserName"), "")
             plugin = _value(node.find("./PlugName"), "")
+            if not plugin and node.tag == "PluginDevice":
+                plugin = _value(node.find(".//PlugName"), "")
+            parameter = _value(node.find("./ParameterName"), "")
             if user:
                 label = f"{label}({user})"
             elif plugin:
                 label = f"{label}({plugin})"
+            elif parameter:
+                label = f"{label}({parameter})"
             names.append(label)
             if node.tag in {"MidiTrack", "AudioTrack", "GroupTrack", "ReturnTrack", "MasterTrack"}:
                 break

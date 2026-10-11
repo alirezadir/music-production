@@ -70,6 +70,15 @@ MINIMAL_ABLETON_SET = """<?xml version="1.0" encoding="UTF-8"?>
           <DeviceChain>
             <Devices>
               <DrumRack Id="1"><UserName Value="Drum Rack" /><On><Manual Value="true" /></On></DrumRack>
+              <PluginDevice Id="2">
+                <PluginDesc><VstPluginInfo><PlugName Value="Test Synth" /></VstPluginInfo></PluginDesc>
+                <ParameterList>
+                  <PluginFloatParameter Id="0">
+                    <ParameterName Value="CUTOFF" />
+                    <ParameterValue><AutomationTarget Id="101" /></ParameterValue>
+                  </PluginFloatParameter>
+                </ParameterList>
+              </PluginDevice>
             </Devices>
           </DeviceChain>
         </DeviceChain>
@@ -139,7 +148,13 @@ class AbletonProjectAnalyzerSmokeTest(unittest.TestCase):
 
     def test_analyzes_project_structure(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            analysis = AbletonProjectAnalyzer(self._write_fixture(Path(tmp))).analyze()
+            analyzer = AbletonProjectAnalyzer(self._write_fixture(Path(tmp)))
+            analysis = analyzer.analyze()
+
+            self.assertEqual(
+                analyzer.target_labels["101"],
+                "MidiTrack / PluginDevice(Test Synth) / ParameterList / PluginFloatParameter(CUTOFF) / ParameterValue",
+            )
 
         self.assertEqual(analysis["project"]["tempo_bpm"], 126.0)
         self.assertEqual(analysis["layers"]["track_count"], 3)

@@ -1,4 +1,4 @@
-import argparse, random
+import argparse, os, random
 import mido
 from mido import MidiFile, MidiTrack, Message
 from json_metadata import create_midi_metadata
@@ -323,8 +323,9 @@ def write_drums_midi(outfile, bpm=124, bars=8, build_bars=2, swing=0.56, human=3
                 adjusted_dt = dt + build_start_offset
                 add_note(tracks[name], typ, note, vel, adjusted_dt)
 
+    os.makedirs(os.path.dirname(outfile) or ".", exist_ok=True)
     mid.save(outfile)
-    
+
     # Generate JSON metadata
     params = {
         "bpm": bpm,

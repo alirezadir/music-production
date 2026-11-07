@@ -1,10 +1,100 @@
-# LALAL.AI v1 stemming tools
+# Local LALAL.AI v1 stem tools
 
-Production-oriented wrappers around the current LALAL.AI API v1 Python workflow.
+Two manually invoked command-line tools use the LALAL.AI API v1:
 
-The main command, `remake-stems`, implements the stem pipeline used for track reconstruction/remakes.
+- `lalal-stems` — request any supported musical stem, several stems, or all stems.
+- `remake-stems` — run the established four-stage reconstruction workflow.
 
-## Pipeline
+These are local CLI tools, not services or background processes. Audio is uploaded
+to LALAL.AI when a non-dry-run command is executed.
+
+## Setup
+
+Requires Python 3.10+ and `requests`.
+
+```bash
+cd stemming/lalalai-v1
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export LALAL_LICENSE="YOUR_LICENSE_KEY"
+```
+
+Do not commit the license key. To make the generic command available from any
+directory, link the executable while the repository remains at a stable path:
+
+```bash
+chmod +x lalal-stems remake-stems
+ln -sf "$(pwd)/lalal-stems" ~/.local/bin/lalal-stems
+ln -sf "$(pwd)/remake-stems" ~/.local/bin/remake-stems
+```
+
+## Generic `lalal-stems` CLI
+
+### Examples
+
+```bash
+# Individual split: downloads the isolated and complementary tracks
+lalal-stems song.wav vocals
+lalal-stems song.wav drums
+lalal-stems song.wav bass
+lalal-stems song.wav piano
+lalal-stems song.wav guitar
+lalal-stems song.wav synth
+lalal-stems song.wav strings
+lalal-stems song.wav wind
+
+# Guitar aliases
+lalal-stems song.wav eguitar
+lalal-stems song.wav aguitar
+
+# Vocals + instrumental shortcut
+lalal-stems song.wav vi
+
+# Multiple splits reuse one source upload
+lalal-stems song.wav vocals drums bass
+
+# Every supported musical split
+lalal-stems song.wav all
+
+# Inspect the plan without uploading or consuming API minutes
+lalal-stems song.wav all --dry-run
+```
+
+Accepted canonical stems are `vocals`, `drum`, `bass`, `piano`, `guitar`,
+`electric_guitar`, `acoustic_guitar`, `synthesizer`, `strings`, and `wind`.
+Aliases are `vi`, `drums`, `synth`, `eguitar`, and `aguitar`.
+
+`vi` is a single `vocals` split; its two outputs are named `vocals` and
+`instrumental`. `all` currently starts ten billable splits. Multiple requested
+stems share one upload, but LALAL.AI charges processing time for every split.
+Always check a costly plan with `--dry-run` first.
+
+### Generic CLI options
+
+| Option | Meaning |
+|---|---|
+| `input` | Local audio file |
+| `stems` | One or more canonical names, aliases, or `all` |
+| `-o, --output` | Output directory; default is `<input parent>/<input stem>` |
+| `--splitter` | `auto`, `andromeda`, `perseus`, `orion`, or `phoenix` |
+| `--extraction-level` | `deep_extraction` or `clear_cut` |
+| `--dereverb` | Enable dereverb for each requested split |
+| `--resume` | Reuse validated outputs and fetch only missing tracks |
+| `--overwrite` | Replace existing outputs after a valid new download completes |
+| `--delete-remote` | Delete the uploaded source and results after the run |
+| `--dry-run` | Print upload count, split count, and expected outputs without API use |
+| `--poll-interval` | Seconds between task checks; default 5 |
+| `--timeout` | Per-request HTTP timeout in seconds; default 60 |
+| `-q, --quiet` | Reduce progress output |
+
+Named models are validated before upload. `auto` is recommended because it picks
+the newest model compatible with each stem. A named model fails early when one
+of the requested stems is unsupported.
+
+## Reconstruction `remake-stems` CLI
+
+The reconstruction command preserves the established workflow:
 
 ```text
 input
@@ -24,173 +114,76 @@ input
   +-- instrumental_no_drums
          |
          +-- [4] bass split
-                +-- secondary bass (discarded by default)
+                +-- secondary bass (optional)
                 +-- instrumental_melodics
-                    (instrumental with drums and bass removed)
 ```
 
-For `San-Francisco-HQ.wav`:
+```bash
+remake-stems "San-Francisco-HQ.wav"
+remake-stems song.wav -o ./stems
+remake-stems song.wav --splitter andromeda
+remake-stems song.wav --extraction-level clear_cut
+remake-stems song.wav --resume
+remake-stems song.wav --overwrite
+remake-stems song.wav --delete-remote
+remake-stems song.wav --keep-secondary-bass
+remake-stems song.wav --dry-run
+```
+
+The secondary bass from stage 4 is not downloaded unless
+`--keep-secondary-bass` is supplied. The preferred bass remains the direct
+stage-3 extraction from the complete instrumental.
+
+## Output naming, format, and recovery
+
+Both commands preserve this convention:
 
 ```text
-San-Francisco-HQ/
-├── San-Francisco-HQ_vocals_lalalai.wav
-├── San-Francisco-HQ_instrumental_lalalai.wav
-├── San-Francisco-HQ_drums_lalalai.wav
-├── San-Francisco-HQ_instrumental_no_drums_lalalai.wav
-├── San-Francisco-HQ_bass_lalalai.wav
-├── San-Francisco-HQ_instrumental_no_bass_lalalai.wav
-└── San-Francisco-HQ_instrumental_melodics_lalalai.wav
+<source>_<stem>_lalalai.<actual-format>
 ```
 
-The step-4 bass is temporary by default because the preferred bass is the direct extraction from the full instrumental in step 3. Pass `--keep-secondary-bass` to retain it.
+The extension is detected from the downloaded audio bytes and checked against
+the response headers. The input suffix is never assumed to be the returned
+format. Downloads go to a temporary `.part` file and become visible under the
+final name only after successful format validation.
 
-## API v1 implementation
+Normal mode refuses existing outputs. `--resume` validates existing audio,
+reuses complete tracks, and reruns only a split with missing output. For a
+partially completed pair, the valid existing track is preserved and only its
+missing counterpart is downloaded. `--overwrite` keeps old outputs until a new
+download has completed and validated, then replaces them.
 
-The wrapper follows the current official v1 Python example:
+## API v1 behavior
+
+The shared implementation follows the official workflow:
 
 1. `POST /api/v1/upload/`
 2. `POST /api/v1/split/stem_separator/`
 3. Poll `POST /api/v1/check/`
-4. Download URLs from `result.tracks`
-5. Optionally `POST /api/v1/delete/`
+4. Identify isolated and complementary tracks from response `label` values
+5. Download and validate returned audio
+6. Optionally `POST /api/v1/delete/`
 
-It identifies isolated vs complementary output using each returned track's API `label`. It intentionally does not depend on LALAL-generated filenames.
+The generic command uploads once and starts one task per requested split. It
+polls all outstanding task IDs together. The reconstruction command keeps its
+stage dependencies and uploads the correct intermediate file at each stage.
 
-Current official stem-separator stems are:
-
-`vocals`, `drum`, `piano`, `bass`, `guitar`, `electric_guitar`,
-`acoustic_guitar`, `synthesizer`, `strings`, `wind`.
-
-This pipeline uses only `vocals`, `drum`, and `bass`.
-
-### Splitter models
-
-The current v1 Python example exposes:
-
-- `auto` - select the latest compatible model
-- `andromeda` - current generation for vocals, drum, piano, bass, guitar
-- `perseus`
-- `orion`
-- `phoenix`
-
-The upstream generic script also lists `lynx` for voice cleaning and `lyra` for demuser/music removal. Those endpoints are not used by `remake-stems`.
-
-## Setup
-
-Requires Python 3.10+ and `requests`.
+## Validation
 
 ```bash
-cd stemming/lalalai-v1
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+python -m py_compile lalal_api.py lalal_stems.py remake_stems.py lalal-stems remake-stems
+python -m unittest discover -s tests -v
+./lalal-stems --help
+python remake_stems.py --help
 ```
 
-Set the license key:
-
-```bash
-export LALAL_LICENSE="YOUR_LICENSE_KEY"
-```
-
-Do not commit the license key.
-
-## Usage
-
-Directly:
-
-```bash
-python3 remake_stems.py "San-Francisco-HQ.wav"
-```
-
-Or install the shell command:
-
-```bash
-chmod +x remake_stems.py
-ln -sf "$(pwd)/remake_stems.py" /usr/local/bin/remake-stems
-```
-
-Then:
-
-```bash
-remake-stems "San-Francisco-HQ.wav"
-```
-
-Custom output:
-
-```bash
-remake-stems song.wav -o ./stems
-```
-
-Choose splitter:
-
-```bash
-remake-stems song.wav --splitter andromeda
-```
-
-Cleaner/lower-bleed extraction:
-
-```bash
-remake-stems song.wav --extraction-level clear_cut
-```
-
-Resume after an interrupted run:
-
-```bash
-remake-stems song.wav --resume
-```
-
-Replace existing files:
-
-```bash
-remake-stems song.wav --overwrite
-```
-
-Delete uploaded/processed files from LALAL.AI storage after each stage:
-
-```bash
-remake-stems song.wav --delete-remote
-```
-
-Keep the secondary bass produced during the melodics stage:
-
-```bash
-remake-stems song.wav --keep-secondary-bass
-```
-
-Full help:
-
-```bash
-remake-stems --help
-```
-
-## Arguments
-
-| Argument | Meaning |
-|---|---|
-| `input` | Input audio file |
-| `-o, --output` | Output folder; default is a folder named after the source track |
-| `--license` | License key override; prefer `LALAL_LICENSE` |
-| `--splitter` | `auto`, `andromeda`, `perseus`, `orion`, or `phoenix` |
-| `--extraction-level` | `deep_extraction` or `clear_cut` |
-| `--dereverb` | Apply dereverb to each separation |
-| `--delete-remote` | Clean remote LALAL files after each stage |
-| `--overwrite` | Replace existing local outputs |
-| `--resume` | Reuse already completed local stages |
-| `--keep-secondary-bass` | Retain step-4 bass |
-| `--poll-interval` | Seconds between task status polls, default 5 |
-| `--timeout` | HTTP timeout in seconds, default 60 |
-| `-q, --quiet` | Reduce console output |
+Authenticated integration tests consume API minutes and upload audio. Run them
+only after explicit approval.
 
 ## Upstream reference
 
 Official repository: https://github.com/OmniSaleGmbH/lalalai
 
-The relevant current examples live in `api-v1/python/`. A snapshot of those official Python examples is kept under `lalalai/api-v1/python/` here for convenient reference. For the newest upstream changes, compare against or re-clone the official repository.
-
-To replace the snapshot with a literal fresh clone locally:
-
-```bash
-cd stemming/lalalai-v1
-rm -rf lalalai
-git clone https://github.com/OmniSaleGmbH/lalalai.git
-```
+The vendored official Python v1 examples remain under `lalalai/api-v1/python/`
+for reference. The local CLIs use the shared `lalal_api.py` module instead of
+modifying those examples.

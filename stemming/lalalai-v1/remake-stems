@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""Run remake_stems.py with this project's local virtual environment."""
+
+import os
+import sys
+from pathlib import Path
+
+
+script_dir = Path(__file__).resolve().parent
+python = script_dir / ".venv" / "bin" / "python"
+if not python.is_file():
+    print(
+        f"ERROR: local environment not found. Run setup from {script_dir}",
+        file=sys.stderr,
+    )
+    raise SystemExit(1)
+os.execv(str(python), [str(python), str(script_dir / "remake_stems.py"), *sys.argv[1:]])
